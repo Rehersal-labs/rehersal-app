@@ -9,31 +9,41 @@ AI avatar platform for rehearsing high-stakes conversations with realistic targe
 
 ---
 
-## For Developers
+## Team documentation (read first)
 
-**All planning documentation is in [`/docs`](./docs/README.md).**
+All specs live in **[`/docs`](./docs/README.md)** — frontend, backend, AI, and 3-person workflow.
 
-| Start here | Description |
-|------------|-------------|
-| [docs/README.md](./docs/README.md) | Documentation index |
-| [docs/DEVELOPMENT_PLAN.md](./docs/DEVELOPMENT_PLAN.md) | Build order & critical path |
-| [docs/TASK_ASSIGNMENTS.md](./docs/TASK_ASSIGNMENTS.md) | Who builds what (parallel tracks) |
-| [docs/SETUP.md](./docs/SETUP.md) | Local setup & env vars |
-
-### Critical path (merge first)
-
-1. Database migrations (`supabase/migrations/001–004`)  
-2. `types/index.ts` + `lib/schemas.ts`  
-3. `lib/db.ts` + `lib/auth.ts`  
-
-Then parallel: **Track A** (UI) · **Track B** (API) · **Track C** (prompts + library content)
-
-### Cursor rules
-
-See [`.cursor/rules/project-rules.md`](./.cursor/rules/project-rules.md).
+| Role | Start here |
+|------|------------|
+| **Everyone** | [docs/README.md](./docs/README.md) |
+| **3 devs parallel** | [docs/TEAM_WORKFLOW.md](./docs/TEAM_WORKFLOW.md) |
+| **Frontend** | [docs/FRONTEND_SPEC.md](./docs/FRONTEND_SPEC.md) + [docs/DESIGN_SYSTEM.md](./docs/DESIGN_SYSTEM.md) |
+| **Backend** | [docs/API_SPEC_FULL.md](./docs/API_SPEC_FULL.md) + [docs/INTEGRATIONS.md](./docs/INTEGRATIONS.md) |
+| **AI / content** | [docs/PROMPTS.md](./docs/PROMPTS.md) + [docs/LIBRARY_JSON_SPEC.md](./docs/LIBRARY_JSON_SPEC.md) |
 
 ---
 
-## Tagline
+## Quick start
 
-Practice job interviews, pitches, negotiations, and difficult conversations with AI avatars modeled on the people you'll actually face.
+```bash
+git clone https://github.com/Rehersal-labs/rehersal-app.git
+cd rehersal-app
+npm install
+cp .env.local.example .env.local
+# Fill env vars — see docs/SETUP.md
+npm run dev
+```
+
+---
+
+## Contracts in code
+
+- `types/index.ts` — TypeScript types  
+- `lib/schemas.ts` — Zod schemas + safety validation  
+- `supabase/migrations/` — Database schema  
+
+---
+
+## Cursor
+
+See [`.cursor/rules/project-rules.md`](./.cursor/rules/project-rules.md).

@@ -1,99 +1,96 @@
 # Rehearsal — System Architecture
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |-------|------------|
 | Framework | Next.js 14 (App Router) |
 | Language | TypeScript 5.x strict |
 | Styling | Tailwind CSS 3.x + shadcn/ui |
-| Database | Supabase (Postgres) |
-| Vector | pgvector via Supabase |
-| AI | OpenAI (gpt-4o, text-embedding-3-small) |
+| Database | Supabase (Postgres) + pgvector |
+| AI | OpenAI gpt-4o + text-embedding-3-small |
 | Avatar | Beyond Presence Managed Agents |
-| Scraping | Native fetch + Cheerio + Jina Reader + manual paste |
-| File parsing | pdf-parse + mammoth |
+| Scraping | Cheerio + Jina Reader + youtube-transcript |
+| Files | pdf-parse + mammoth |
 | Charts | Recharts |
 | Forms | React Hook Form + Zod |
 | Data fetching | TanStack Query v5 |
 | Auth | Supabase Auth (Google + magic link) |
 | Deploy | Vercel |
 
-**Do NOT use:** Stripe, Anthropic, Pinecone, Firecrawl, separate Node backend, MongoDB, Express.
+**Not used:** Stripe, Claude, Pinecone, Express, MongoDB.
 
 ---
 
-## High-Level Diagram
+## High-level diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     Next.js App Router                       │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐ │
-│  │ (auth) pages │  │ (app) pages  │  │ API Routes       │ │
-│  └──────┬───────┘  └──────┬───────┘  └────────┬─────────┘ │
-│         │                 │                    │           │
-│         └─────────────────┼────────────────────┘           │
-│                           │ TanStack Query                  │
-└───────────────────────────┼─────────────────────────────────┘
-                            │
-        ┌───────────────────┼───────────────────┐
-        ▼                   ▼                   ▼
-   Supabase Auth      Supabase Postgres    Supabase Storage
-   (sessions)         + pgvector RLS       (documents, PDFs)
-        │                   │
-        │                   ├── OpenAI (reconstruct, embed, evaluate)
-        │                   └── Beyond Presence (live calls, transcript)
+│  (auth) pages  │  (app) pages  │  API Route Handlers        │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         ▼                   ▼                   ▼
+   Supabase Auth      Supabase Postgres     Supabase Storage
+                      + pgvector RLS
+         │                   │
+         │                   ├── OpenAI (reconstruct, embed, evaluate)
+         │                   └── Beyond Presence (calls, messages)
 ```
 
 ---
 
-## Core Data Flows
+## Core pipelines
 
-### Target Reconstruction
-```
-Sources (URL/doc/manual) → scraper/fileParser → raw_text
-  → OpenAI + PersonalityJSONSchema → personality_json
-  → avatar_brief_template → target_profiles.status = complete
-```
+| Pipeline | Entry | Output |
+|----------|-------|--------|
+| Reconstruction | POST `/api/targets/[id]/reconstruct` | `personality_json` |
+| Embedding | POST `/api/documents` | `document_chunks` + vectors |
+| Session | POST `/api/sessions` | `join_url` + system prompt |
+| Evaluation | POST `/api/sessions/[id]/end` | `feedback_reports` |
 
-### Session Creation
-```
-scenario + target + documents
-  → contextRetriever (embed query, top 5 chunks)
-  → avatarBriefBuilder (persona + context + type + difficulty)
-  → sessions row + beyondPresence.createCall()
-  → join_url to client iframe
-```
-
-### Post-Session
-```
-end session → sync BP messages → session_turns
-  → evaluator (EvaluationSchema) → evaluations
-  → reportBuilder (FeedbackReportSchema) → feedback_reports
-  → session.status = report_ready
-```
+Details: [INTEGRATIONS.md](./INTEGRATIONS.md)
 
 ---
 
-## Supabase Clients
+## Supabase clients (`lib/db.ts`)
 
-| Client | Key | Usage |
-|--------|-----|--------|
-| `createBrowserClient()` | anon | Client components |
-| `createServerClient()` | anon + cookies | Server components |
-| `createServiceClient()` | service role | API routes only — **never in browser** |
-
----
-
-## Repository Layout
-
-See [REPO_STRUCTURE.md](./REPO_STRUCTURE.md).
+| Client | Where |
+|--------|--------|
+| `createBrowserClient()` | Client components |
+| `createServerClient()` | Server components (cookies) |
+| `createServiceClient()` | API routes only — **never browser** |
 
 ---
 
-## Security Model
+## Auth helpers (`lib/auth.ts`)
 
-- **RLS** on all tables; org access via `memberships`  
-- **Service role** only in API routes for elevated operations  
-- **Secrets** server-side: `SUPABASE_SERVICE_ROLE_KEY`, `BEY_API_KEY`, `OPENAI_API_KEY`  
-- **Public**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL`
+- `getCurrentUser()`, `getCurrentOrg()`, `getCurrentMembership()`  
+- `requireAuth()`, `requireRole(['coach', 'owner'])`  
+
+---
+
+## Security
+
+- RLS on all tables ([DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md))  
+- Service role only in API routes  
+- AI safety validation ([SAFETY.md](./SAFETY.md))  
+- Consent required before live session  
+
+---
+
+## Code contracts
+
+| File | Purpose |
+|------|---------|
+| `types/index.ts` | All TS types |
+| `lib/schemas.ts` | Zod validation + safety helpers |
+
+---
+
+## Related docs
+
+- [API_SPEC_FULL.md](./API_SPEC_FULL.md)  
+- [FRONTEND_SPEC.md](./FRONTEND_SPEC.md)  
+- [REPO_STRUCTURE.md](./REPO_STRUCTURE.md)  

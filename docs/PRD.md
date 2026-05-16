@@ -1,123 +1,179 @@
 # Rehearsal — Product Requirements Document
 
-**Tagline:** Have the conversation before you have it.  
-**Powered by:** [Beyond Presence](https://bey.dev) (real-time avatar API)
+**Tagline:** Have the conversation before you have it.
 
 ---
 
-## 1. Product Overview
+## 1. Product overview
 
-Rehearsal is a web application where users practice high-stakes conversations with AI avatars. The avatar is a digital twin of the actual person the user is about to face — reconstructed from public sources (LinkedIn, podcasts, articles) plus user-uploaded context (resume, deck, notes). After the session, the user receives a feedback report specific to that target.
+Rehearsal is a web app where users practice high-stakes conversations with AI avatars — digital twins of people they will face, built from public sources plus user-uploaded context. After each session, users receive a **target-specific feedback report**.
 
-### Core Loop
-
-```
-Build target profile → Upload context → Configure scenario → Run live avatar session → Receive feedback report → Track progress
-```
+**Powered by:** Beyond Presence (real-time avatar API)
 
 ---
 
-## 2. User Modes
+## 2. Core loop
+
+1. Build target profile  
+2. Upload context documents  
+3. Configure scenario  
+4. Run live avatar session  
+5. Receive feedback report  
+6. Track progress over time  
+
+---
+
+## 3. User modes
 
 | Mode | Description |
 |------|-------------|
-| **Solo** | Individual users practicing their own conversations. Private workspace. |
-| **Team** | Organizations with shared company context, coaches who assign scenarios, learners who complete them. |
+| **Solo** | Individual practice, private workspace |
+| **Team** | Shared company docs, coaches assign scenarios, learners complete them |
 
-**Rule:** Both modes are equal. Team mode **adds** features (assignments, coach view, shared docs). It never restricts what individuals can do.
-
----
-
-## 3. Conversation Types (10)
-
-1. Job Interview  
-2. Fundraising Pitch  
-3. Sales Discovery  
-4. Difficult Conversation  
-5. Negotiation  
-6. Deposition / Legal Prep  
-7. Media / Podcast Interview  
-8. Board Meeting  
-9. Personal Conversation  
-10. Custom  
+Team mode **adds** features; it never restricts solo capabilities.
 
 ---
 
-## 4. Features (MVP)
+## 4. Conversation types (10)
 
-### F1 — Target Profile Builder
-- Inputs: URLs, PDF/DOCX uploads, manual text
-- Pipeline: scrape → concatenate → OpenAI reconstruction → `personality_json` + `avatar_brief_template`
-- UI: 4-step builder (Basics → Sources → Reconstruction → Review)
+| # | Type | Enum value |
+|---|------|------------|
+| 1 | Job Interview | `job_interview` |
+| 2 | Fundraising Pitch | `fundraising_pitch` |
+| 3 | Sales Discovery | `sales_discovery` |
+| 4 | Difficult Conversation | `difficult_conversation` |
+| 5 | Negotiation | `negotiation` |
+| 6 | Deposition / Legal Prep | `deposition_legal` |
+| 7 | Media / Podcast Interview | `media_podcast` |
+| 8 | Board Meeting | `board_meeting` |
+| 9 | Personal Conversation | `personal_conversation` |
+| 10 | Custom | `custom` |
 
-### F2 — User Context Engine
-- Upload PDF/DOCX → extract → chunk (512 tokens, 50 overlap) → embed → pgvector
-- Retrieval: top 5 chunks injected into avatar system prompt at session start
+---
 
-### F3 — Shared Company Context (Team only)
-- Admin uploads org-wide documents; coaches/learners read only
+## 5. Feature specifications
 
-### F4 — Scenario Configurator
-- 10 conversation types, target picker, duration 5–30 min, difficulty 1–5, goal, document multi-select, avatar brief preview
-- Team coach: assign to learners + due date
+### F1 — Target profile builder
 
-### F5 — Live Avatar Session
-- Pre-session checklist (mic, camera, consent)
-- Beyond Presence iframe session
-- End → transcript sync → evaluation → report
+**Goal:** Reconstruct personality model of the person the user will face.
 
-### F6 — Feedback Report
-- Scores, executive summary, best/weak moments, missed signals, delivery metrics, transcript, accuracy rating, PDF export
+**Inputs:** URLs, PDF/DOCX about target, manual text (private individuals)
 
-### F7 — Progress Dashboard
-- Metrics, improvement chart, skill radar, session history, per-target scores
-- Team coach: My Progress / Team Progress toggle
+**Pipeline:** scrape → store `raw_text` → OpenAI reconstruction → `personality_json` + `avatar_brief_template`
 
-### F8 — Public Figure Library
-- 15 cloneable archetypes (10 professional + 5 personal)
-- Browse, filter, clone to workspace
+**UI:** 4 steps — Basics → Sources → Reconstruction (poll 3s) → Review
 
-### F9 — Solo Dashboard
-- Greeting, stats, action cards, continue sessions, targets grid, recommendations, weekly heatmap
+**Personality JSON fields:** `communication_style`, `core_values`, `typical_question_patterns`, `known_priorities`, `known_skepticisms`, `what_impresses_them`, `what_irritates_them`, `expertise_areas`, `behavioral_signals`, `inferred_concerns_by_context`, `source_citations`, `confidence`
 
-### F10 — Team Coach Dashboard
-- Solo dashboard + team pulse band
+→ UI detail: [FRONTEND_SPEC.md](./FRONTEND_SPEC.md#f1--targets)  
+→ API: [API_SPEC_FULL.md](./API_SPEC_FULL.md#targets)
+
+---
+
+### F2 — User context engine
+
+Upload PDF/DOCX → Supabase Storage → extract → chunk (512 tokens, 50 overlap) → embed → pgvector
+
+At session start: embed `scenario.goal` → top 5 chunks → inject into avatar system prompt
+
+---
+
+### F3 — Shared company context (team only)
+
+Admins upload org-wide docs (`is_company_shared`). Coaches/learners read. Hidden in solo mode.
+
+---
+
+### F4 — Scenario configurator
+
+10 conversation types, target picker, duration 5–30 min (step 5), difficulty 1–5, goal textarea, document multi-select, avatar brief preview. Coaches assign to learners + due date.
+
+→ [FRONTEND_SPEC.md](./FRONTEND_SPEC.md#f4--scenarios)
+
+---
+
+### F5 — Live avatar session
+
+Pre-session: mic, camera, context summary, **consent checkbox** (required), AI disclosure
+
+Live: BP iframe 16:9, timer, coaching break, end session
+
+Post: sync transcript → evaluate → poll until `report_ready`
+
+→ [INTEGRATIONS.md](./INTEGRATIONS.md#beyond-presence)
+
+---
+
+### F6 — Feedback report (highest priority)
+
+Scores, executive summary, best/weak moments, missed signals, delivery grid, transcript, accuracy rating, PDF export, coach comments (team)
+
+→ [FRONTEND_SPEC.md](./FRONTEND_SPEC.md#f6--feedback-report-appappreportsidpagets--priority)
+
+---
+
+### F7 — Progress dashboard
+
+Metrics, line chart, skill radar (6 axes), session history, per-target bars, team toggle for coaches
+
+---
+
+### F8 — Public figure library
+
+15 cloneable archetypes (10 professional + 5 personal). Browse, filter, clone.
+
+→ [LIBRARY_JSON_SPEC.md](./LIBRARY_JSON_SPEC.md)
+
+---
+
+### F9 — Solo dashboard
+
+Greeting, stats, action cards, continue sessions, targets grid, recommendations, weekly heatmap, empty state
+
+---
+
+### F10 — Team coach dashboard
+
+F9 + team pulse band (4 stats)
+
+---
 
 ### F11 — Assignments
-- Coach: create/manage assignments  
-- Learner: inbox with Start button
 
-### F12 — Admin Team View
-- Member table, skill gaps, team reports
+Coach: create/manage. Learner: inbox + Start.
+
+---
+
+### F12 — Admin team view
+
+Member table, skill gaps, team reports. Team only.
+
+---
 
 ### F13 — Settings
-- Solo: General, Account, Data  
-- Team: General, Team, Data, Account (invites, roles)
 
-### F14 — Authentication & Onboarding
-- Google OAuth + magic link
-- 5-step onboarding (intent, workspace, use case, starter target, team invites)
+Solo: General, Account, Data. Team: + Team tab (invites, roles). Workspace delete with confirmation.
 
 ---
 
-## 5. Out of Scope (MVP)
+### F14 — Auth & onboarding
 
-- Stripe / payments / billing  
-- Landing / marketing / pricing pages  
-- Subscription plans, usage quotas, waitlist  
-- Mobile app, SSO/SAML, LMS/CRM integrations  
-- Speech-to-video custom pipeline, facial emotion analysis  
-- Automated hiring decisions, public API  
-- In-app notification system (toast only)
+Google + magic link. 5-step onboarding. Redirect to `/dashboard`.
 
 ---
 
-## 6. Success Criteria
+## 6. Out of scope (MVP)
 
-See [SUCCESS_CRITERIA.md](./SUCCESS_CRITERIA.md) for the full checklist.
+Stripe, landing/marketing pages, mobile app, SSO, LMS integrations, public API, billing quotas, in-app notification system (toast only).
 
 ---
 
-## 7. Safety (Non-Negotiable)
+## 7. Related documents
 
-See [SAFETY.md](./SAFETY.md).
+| Doc | Audience |
+|-----|----------|
+| [FRONTEND_SPEC.md](./FRONTEND_SPEC.md) | UI developer |
+| [API_SPEC_FULL.md](./API_SPEC_FULL.md) | Backend developer |
+| [PROMPTS.md](./PROMPTS.md) | AI developer |
+| [SAFETY.md](./SAFETY.md) | Everyone |
+| [SUCCESS_CRITERIA.md](./SUCCESS_CRITERIA.md) | QA / lead |

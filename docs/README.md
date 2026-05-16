@@ -1,31 +1,78 @@
 # Rehearsal Documentation
 
-Planning docs for the development team. **Start here before writing code.**
+**Start here.** Everything your team needs to build frontend, backend, and AI features.
 
-## Quick Start
+**Repo:** https://github.com/Rehersal-labs/rehersal-app
 
-1. Read [SETUP.md](./SETUP.md) — clone, env, Supabase  
-2. Complete [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md) **Critical Path** (Steps 1–3)  
-3. Pick your track in [TASK_ASSIGNMENTS.md](./TASK_ASSIGNMENTS.md)  
+---
 
-## Document Index
+## For a 3-person team
 
-| Document | Purpose |
-|----------|---------|
-| [PRD.md](./PRD.md) | Product requirements & features |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | System design & tech stack |
-| [REPO_STRUCTURE.md](./REPO_STRUCTURE.md) | Folder layout |
-| [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | Tables, enums, RLS summary |
-| [MIGRATIONS.md](./MIGRATIONS.md) | SQL migration implementation guide |
-| [API_SPEC.md](./API_SPEC.md) | All REST endpoints |
-| [PROMPTS.md](./PROMPTS.md) | AI prompt templates |
-| [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Colors, typography, UI rules |
-| [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md) | Build order & checkpoints |
-| [TASK_ASSIGNMENTS.md](./TASK_ASSIGNMENTS.md) | Parallel dev assignments |
-| [SETUP.md](./SETUP.md) | Local dev & deployment |
-| [SAFETY.md](./SAFETY.md) | Non-negotiable safety rules |
+1. Read [TEAM_WORKFLOW.md](./TEAM_WORKFLOW.md) — roles, branches, no-conflict rules  
+2. Member 1 merges `feat/contracts` (migrations + types + schemas)  
+3. Each member picks tasks from [TASK_ASSIGNMENTS.md](./TASK_ASSIGNMENTS.md)  
+
+---
+
+## Document map
+
+### Everyone
+
+| Doc | What's inside |
+|-----|----------------|
+| [PRD.md](./PRD.md) | Product features F1–F14 |
 | [SUCCESS_CRITERIA.md](./SUCCESS_CRITERIA.md) | MVP definition of done |
+| [SAFETY.md](./SAFETY.md) | AI safety rules |
+| [SETUP.md](./SETUP.md) | Clone, env, Supabase, deploy |
+| [REPO_STRUCTURE.md](./REPO_STRUCTURE.md) | Folder layout |
 
-## Repository
+### Member 1 — Backend / platform
 
-https://github.com/Rehersal-labs/rehersal-app
+| Doc | What's inside |
+|-----|----------------|
+| [API_SPEC_FULL.md](./API_SPEC_FULL.md) | **All endpoints + JSON examples** |
+| [API_SPEC.md](./API_SPEC.md) | Route index (quick lookup) |
+| [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | Tables & enums |
+| [MIGRATIONS.md](./MIGRATIONS.md) | SQL migration guide |
+| [INTEGRATIONS.md](./INTEGRATIONS.md) | Beyond Presence, OpenAI, scrapers |
+
+### Member 2 — Frontend / UI
+
+| Doc | What's inside |
+|-----|----------------|
+| [FRONTEND_SPEC.md](./FRONTEND_SPEC.md) | **Every page & component** |
+| [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Colors, fonts, motion |
+
+### Member 3 — AI & content
+
+| Doc | What's inside |
+|-----|----------------|
+| [PROMPTS.md](./PROMPTS.md) | All prompt templates |
+| [LIBRARY_JSON_SPEC.md](./LIBRARY_JSON_SPEC.md) | 15 library files + example JSON |
+| [INTEGRATIONS.md](./INTEGRATIONS.md) | Pipelines (reconstruction, evaluator) |
+
+### Project lead
+
+| Doc | What's inside |
+|-----|----------------|
+| [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md) | Build order & checkpoints |
+| [TASK_ASSIGNMENTS.md](./TASK_ASSIGNMENTS.md) | Task lists per track |
+
+---
+
+## Code is also documentation
+
+| File | Use |
+|------|-----|
+| `types/index.ts` | TypeScript contracts |
+| `lib/schemas.ts` | Zod validation + forbidden phrase check |
+| `supabase/migrations/*.sql` | Actual database schema |
+
+When docs and code disagree, **fix code or update docs in the same PR**.
+
+---
+
+## Quick links
+
+- Cursor rules: [../.cursor/rules/project-rules.md](../.cursor/rules/project-rules.md)  
+- Env template: [../.env.local.example](../.env.local.example)  
