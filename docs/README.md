@@ -24,6 +24,7 @@
 | [SUCCESS_CRITERIA.md](./SUCCESS_CRITERIA.md) | MVP definition of done |
 | [SAFETY.md](./SAFETY.md) | AI safety rules |
 | [SETUP.md](./SETUP.md) | Clone, env, Supabase, deploy |
+| [CONFIG.md](./CONFIG.md) | **Complete env + service checklist** |
 | [REPO_STRUCTURE.md](./REPO_STRUCTURE.md) | Folder layout |
 
 ### Member 1 — Backend / platform
@@ -71,6 +72,11 @@
 When docs and code disagree, **fix code or update docs in the same PR**.
 
 ---
+
+## Agent / handoff
+
+- [AGENTS.md](../AGENTS.md) — start here for a new Cursor session  
+- [STATUS.md](./STATUS.md) — what’s done and what’s next  
 
 ## Quick links
 

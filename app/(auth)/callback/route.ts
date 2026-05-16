@@ -29,7 +29,11 @@ export async function GET(request: Request) {
         });
       }
 
-      const next = nextParam ?? (isNewUser ? "/onboarding" : "/dashboard");
+      const defaultNext = isNewUser ? "/onboarding" : "/dashboard";
+      const next =
+        nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+          ? nextParam
+          : defaultNext;
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
