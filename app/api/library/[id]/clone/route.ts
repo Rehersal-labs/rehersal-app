@@ -1,37 +1,16 @@
 import { requireAuth } from "@/lib/api/auth";
 import { jsonError, jsonOk } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
-import { loadLibraryFromFiles } from "@/lib/loadLibraryProfiles";
-import { isLibraryDbReady } from "@/lib/libraryDbReady";
-import type { LibraryProfile } from "@/types";
+import { getLibraryProfileById } from "@/lib/libraryApi";
+import { isLibraryDbSeedable } from "@/lib/libraryDbReady";
 
 type RouteContext = { params: { id: string } };
-
-async function resolveLibraryProfile(
-  id: string
-): Promise<LibraryProfile | null> {
-  if (!(await isLibraryDbReady())) {
-    return (await loadLibraryFromFiles()).find((p) => p.id === id) ?? null;
-  }
-
-  const supabase = createServiceSupabaseClient();
-  const { data, error } = await supabase
-    .from("public_figure_library")
-    .select("*")
-    .eq("id", id)
-    .eq("moderation_status", "approved")
-    .single();
-
-  if (!error && data) return data as LibraryProfile;
-
-  return (await loadLibraryFromFiles()).find((p) => p.id === id) ?? null;
-}
 
 export async function POST(_request: Request, { params }: RouteContext) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
-  const profile = await resolveLibraryProfile(params.id);
+  const profile = await getLibraryProfileById(params.id);
   if (!profile) return jsonError("Profile not found", 404);
 
   const supabase = createServiceSupabaseClient();
@@ -59,7 +38,7 @@ export async function POST(_request: Request, { params }: RouteContext) {
     return jsonError(insertError?.message ?? "Failed to clone profile", 500);
   }
 
-  if (await isLibraryDbReady()) {
+  if (await isLibraryDbSeedable()) {
     await supabase
       .from("public_figure_library")
       .update({ usage_count: (profile.usage_count ?? 0) + 1 })

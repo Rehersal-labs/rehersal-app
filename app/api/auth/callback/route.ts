@@ -35,8 +35,11 @@ export async function GET(request: Request) {
     });
   }
 
+  const defaultNext = isNewUser ? "/onboarding" : "/dashboard";
   const next =
-    nextParam ?? (isNewUser ? "/onboarding" : "/dashboard");
+    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+      ? nextParam
+      : defaultNext;
 
   return NextResponse.redirect(`${origin}${next}`);
 }

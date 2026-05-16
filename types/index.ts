@@ -82,7 +82,7 @@ export interface PersonalityJSON {
   what_irritates_them: string[];
   expertise_areas: string[];
   behavioral_signals: string[];
-  inferred_concerns_by_context: Record<ConversationType | string, string[]>;
+  inferred_concerns_by_context: Partial<Record<ConversationType, string[]>>;
   source_citations: Record<string, string>;
   confidence: Record<string, ConfidenceLevel>;
 }

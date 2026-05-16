@@ -27,7 +27,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
 
   const { data: session } = await supabase
     .from("sessions")
-    .select("user_id")
+    .select("user_id, scenario_id")
     .eq("id", report.session_id)
     .single();
 
@@ -36,22 +36,30 @@ export async function GET(_request: Request, { params }: RouteContext) {
     return jsonError("Forbidden", 403);
   }
 
-  const [{ data: evaluation }, { data: coach_comments }] = await Promise.all([
-    supabase
-      .from("evaluations")
-      .select("overall_score, target_fit_score, confidence")
-      .eq("session_id", report.session_id)
-      .maybeSingle(),
-    supabase
-      .from("coach_comments")
-      .select("*")
-      .eq("report_id", params.id)
-      .order("created_at", { ascending: true }),
-  ]);
+  const [{ data: evaluation }, { data: coach_comments }, { data: turns }] =
+    await Promise.all([
+      supabase
+        .from("evaluations")
+        .select("overall_score, target_fit_score, confidence")
+        .eq("session_id", report.session_id)
+        .maybeSingle(),
+      supabase
+        .from("coach_comments")
+        .select("*")
+        .eq("report_id", params.id)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("session_turns")
+        .select("*")
+        .eq("session_id", report.session_id)
+        .order("sequence", { ascending: true }),
+    ]);
 
   return jsonOk({
     report,
     evaluation: evaluation ?? null,
     coach_comments: coach_comments ?? [],
+    scenario_id: session?.scenario_id ?? null,
+    turns: turns ?? [],
   });
 }

@@ -22,8 +22,12 @@ const RECOMMENDED: { key: string; label: string }[] = [
 ];
 
 const OPTIONAL: string[] = [
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
   "BEY_WEBHOOK_SECRET",
+  "DATABASE_URL",
   "RESEND_API_KEY",
+  "RESEND_FROM_EMAIL",
   "NEXT_PUBLIC_POSTHOG_KEY",
   "NEXT_PUBLIC_POSTHOG_HOST",
   "NEXT_PUBLIC_SENTRY_DSN",
@@ -102,6 +106,17 @@ function main() {
   } else {
     console.log("All required and recommended variables are set.");
   }
+  const googleId = env.GOOGLE_CLIENT_ID?.trim() ?? "";
+  const googleSecret = env.GOOGLE_CLIENT_SECRET?.trim() ?? "";
+  if (!googleId || !googleSecret) {
+    console.log(
+      "\nGoogle sign-in: enable in Supabase → Auth → Google (see docs/GOOGLE_AUTH.md)."
+    );
+    console.log(
+      "  GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET in .env.local are optional reference copies."
+    );
+  }
+
   console.log("\nNext: npm run verify:supabase && npm run dev");
 }
 

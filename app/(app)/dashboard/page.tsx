@@ -1,18 +1,15 @@
-import { requireSession } from "@/lib/auth";
-import { getGreeting } from "@/lib/utils";
+import { requireSession, canManageTeam } from "@/lib/auth";
+import { DashboardContent } from "@/components/DashboardContent";
 
 export default async function DashboardPage() {
-  const { user } = await requireSession();
-  const name = user.name?.split(" ")[0] ?? "there";
+  const session = await requireSession();
+  const name = session.user.name?.split(" ")[0] ?? "there";
 
   return (
-    <div className="mx-auto max-w-app p-8">
-      <h1 className="font-display text-display-2 text-foreground-primary">
-        {getGreeting()}, {name}
-      </h1>
-      <p className="mt-2 text-body text-foreground-secondary">
-        Dashboard UI ships in Phase B. Foundation is ready.
-      </p>
-    </div>
+    <DashboardContent
+      userName={name}
+      isCoach={canManageTeam(session.membership.role)}
+      isTeam={session.organization.mode === "team"}
+    />
   );
 }

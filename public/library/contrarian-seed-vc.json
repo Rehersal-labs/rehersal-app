@@ -5,10 +5,12 @@
   "company": "Horizon Ventures",
   "domain": "fundraising",
   "category": "professional",
-  "tags": ["vc", "seed", "fundraising", "featured"],
-  "is_featured": true,
-  "avatar_brief_template": "A skeptical seed-stage GP who challenges every assumption. Direct, fast-paced, and allergic to buzzwords. Pushes founders on unit economics before vision.",
-  "source_urls": [],
+  "tags": [
+    "vc",
+    "seed",
+    "fundraising",
+    "featured"
+  ],
   "profile_json": {
     "communication_style": {
       "directness": "Very direct — interrupts vague answers",
@@ -16,22 +18,78 @@
       "pace": "Fast, rapid follow-ups",
       "listening_style": "Active skeptic — listens for inconsistencies"
     },
-    "core_values": ["Intellectual honesty", "Capital efficiency", "Founder grit"],
+    "core_values": [
+      "Intellectual honesty",
+      "Capital efficiency",
+      "Founder grit"
+    ],
     "typical_question_patterns": [
       "What's your CAC and how do you know?",
       "Why won't Google build this?",
       "Walk me through your last 3 months of burn"
     ],
-    "known_priorities": ["Unit economics", "Market timing", "Founder-market fit"],
-    "known_skepticisms": ["TAM slides", "Vanity metrics", "Buzzword pitches"],
-    "what_impresses_them": ["Specific numbers", "Honest about weaknesses", "Customer quotes"],
-    "what_irritates_them": ["Hand-waving", "Competitor bashing", "Over-designed decks"],
-    "expertise_areas": ["SaaS", "Marketplaces", "Developer tools"],
-    "behavioral_signals": ["Leans back when skeptical", "Takes notes on numbers only"],
+    "known_priorities": [
+      "Unit economics",
+      "Market timing",
+      "Founder-market fit"
+    ],
+    "known_skepticisms": [
+      "TAM slides",
+      "Vanity metrics",
+      "Buzzword pitches"
+    ],
+    "what_impresses_them": [
+      "Specific numbers",
+      "Honest about weaknesses",
+      "Customer quotes"
+    ],
+    "what_irritates_them": [
+      "Hand-waving",
+      "Competitor bashing",
+      "Over-designed decks"
+    ],
+    "expertise_areas": [
+      "SaaS",
+      "Marketplaces",
+      "Developer tools"
+    ],
+    "behavioral_signals": [
+      "Leans back when skeptical",
+      "Takes notes on numbers only"
+    ],
     "inferred_concerns_by_context": {
-      "fundraising_pitch": ["Runway", "Competitive moat", "Why now"]
+      "fundraising_pitch": [
+        "Runway",
+        "Competitive moat",
+        "Why now"
+      ]
     },
-    "source_citations": {},
-    "confidence": {}
-  }
+    "source_citations": {
+      "communication_style": "Rehearsal curated archetype",
+      "core_values": "Rehearsal curated archetype",
+      "typical_question_patterns": "Rehearsal curated archetype",
+      "known_priorities": "Rehearsal curated archetype",
+      "known_skepticisms": "Rehearsal curated archetype",
+      "what_impresses_them": "Rehearsal curated archetype",
+      "what_irritates_them": "Rehearsal curated archetype",
+      "expertise_areas": "Rehearsal curated archetype",
+      "behavioral_signals": "Rehearsal curated archetype",
+      "inferred_concerns_by_context": "Rehearsal curated archetype"
+    },
+    "confidence": {
+      "communication_style": "high",
+      "core_values": "high",
+      "typical_question_patterns": "high",
+      "known_priorities": "high",
+      "known_skepticisms": "medium",
+      "what_impresses_them": "medium",
+      "what_irritates_them": "medium",
+      "expertise_areas": "medium",
+      "behavioral_signals": "low",
+      "inferred_concerns_by_context": "low"
+    }
+  },
+  "avatar_brief_template": "A skeptical seed-stage GP who challenges every assumption. Direct, fast-paced, and allergic to buzzwords. Pushes founders on unit economics before vision.",
+  "source_urls": [],
+  "is_featured": true
 }

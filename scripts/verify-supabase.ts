@@ -2,6 +2,7 @@
  * Verify Supabase connection and migration state.
  * Usage: npm run verify:supabase
  */
+import { getLibrarySchemaCapabilities } from "../lib/librarySchema";
 import { createAdminClient, getSupabaseProjectUrl } from "../lib/supabaseAdmin";
 
 const REQUIRED_LIBRARY_COLUMNS = [
@@ -12,16 +13,6 @@ const REQUIRED_LIBRARY_COLUMNS = [
   "domain",
   "tags",
 ];
-
-async function getLibraryColumns(url: string, key: string): Promise<string[]> {
-  const res = await fetch(`${url}/rest/v1/`, {
-    headers: { apikey: key, Authorization: `Bearer ${key}` },
-  });
-  const spec = (await res.json()) as {
-    definitions?: Record<string, { properties?: Record<string, unknown> }>;
-  };
-  return Object.keys(spec.definitions?.public_figure_library?.properties ?? {});
-}
 
 async function main() {
   const raw = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -57,16 +48,29 @@ async function main() {
     }
   }
 
-  const libraryCols = await getLibraryColumns(url, key);
+  const { columns: libraryCols, seedable, ready, idFormat } =
+    await getLibrarySchemaCapabilities();
+
+  if (idFormat === "uuid") {
+    console.log("\n  ✗ public_figure_library.id is UUID — run migration 009_library_id_text.sql");
+    failed = true;
+  } else if (idFormat === "text") {
+    console.log("\n  ✓ public_figure_library.id is TEXT (lib_* slugs)");
+  }
   console.log("\nLibrary columns check:");
   for (const col of REQUIRED_LIBRARY_COLUMNS) {
     if (libraryCols.includes(col)) {
       console.log(`  ✓ ${col}`);
     } else {
       console.log(`  ✗ ${col} — run supabase/migrations/007_fix_public_figure_library.sql`);
-      failed = true;
+      if (col === "category" || col === "is_featured") {
+        console.log("    (partial seed still works; API merges with public/library/*.json)");
+      } else {
+        failed = true;
+      }
     }
   }
+  console.log(`\n  Library seedable: ${seedable ? "yes" : "no"}, full schema: ${ready ? "yes" : "no"}`);
 
   const { error: rpcError } = await supabase.rpc("match_document_chunks", {
     query_embedding: Array(1536).fill(0),
@@ -88,6 +92,13 @@ async function main() {
   if (failed) {
     console.log("\nFix failed checks in Supabase SQL Editor, then re-run verify.");
     process.exit(1);
+  }
+
+  if (!ready) {
+    console.log(
+      "\nCore checks OK. Run migration 007 for category/is_featured, then: npm run seed:library"
+    );
+    process.exit(0);
   }
 
   console.log("\nAll checks passed. Run: npm run seed:library");

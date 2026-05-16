@@ -1,20 +1,30 @@
+import { AppShell } from "@/components/shared/AppShell";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { requireSession } from "@/lib/auth";
+import { createServiceSupabaseClient } from "@/lib/db";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await requireSession();
+  const session = await requireSession();
+
+  let pendingAssignments = 0;
+  if (session.organization.mode === "team") {
+    const supabase = createServiceSupabaseClient();
+    const { count } = await supabase
+      .from("assignments")
+      .select("*", { count: "exact", head: true })
+      .eq("org_id", session.organization.id)
+      .eq("learner_id", session.user.id)
+      .eq("status", "pending");
+    pendingAssignments = count ?? 0;
+  }
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="hidden w-sidebar shrink-0 border-r border-border bg-surface md:block">
-        <div className="p-4 font-display text-h3 text-foreground-primary">
-          Rehearsal
-        </div>
-      </aside>
-      <main className="flex-1 overflow-auto">{children}</main>
-    </div>
+    <AppShell session={session} pendingAssignments={pendingAssignments}>
+      <ErrorBoundary>{children}</ErrorBoundary>
+    </AppShell>
   );
 }

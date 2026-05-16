@@ -3,6 +3,7 @@ import { Fraunces } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { Providers } from "@/components/providers";
+import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -31,7 +32,10 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${geistSans.variable} ${geistMono.variable} min-h-screen bg-background antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

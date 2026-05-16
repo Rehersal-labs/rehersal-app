@@ -12,6 +12,8 @@ import type {
   FeedbackReport,
   Scenario,
   Session,
+  SessionHistoryItem,
+  SessionTurn,
   TargetProfile,
   TargetStatus,
   UserDocument,
@@ -112,6 +114,8 @@ export function useReport(id: string) {
         report: FeedbackReport;
         evaluation: { overall_score: number; target_fit_score: number } | null;
         coach_comments: unknown[];
+        scenario_id: string | null;
+        turns: SessionTurn[];
       }>(`/api/reports/${id}`),
     enabled: !!id,
   });
@@ -292,5 +296,35 @@ export function useCreateAssignment() {
         body: JSON.stringify(body),
       }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["assignments"] }),
+  });
+}
+
+export type TeamMemberRow = {
+  membership_id: string;
+  role: string;
+  joined_at: string;
+  user: {
+    id: string;
+    email: string | null;
+    name: string | null;
+    avatar_url: string | null;
+  };
+};
+
+export function useTeamMembers(enabled = true) {
+  return useQuery({
+    queryKey: ["team", "members"],
+    queryFn: () =>
+      apiFetch<{ members: TeamMemberRow[] }>("/api/team/members"),
+    enabled,
+  });
+}
+
+export function useAdminSessions(enabled = true) {
+  return useQuery({
+    queryKey: ["admin", "sessions"],
+    queryFn: () =>
+      apiFetch<{ sessions: SessionHistoryItem[] }>("/api/admin/sessions"),
+    enabled,
   });
 }

@@ -1,21 +1,25 @@
-import { createServiceSupabaseClient } from "@/lib/db";
+import { getLibrarySchemaCapabilities } from "@/lib/librarySchema";
 
-let cached: boolean | null = null;
+let cachedReady: boolean | null = null;
+let cachedSeedable: boolean | null = null;
 
 /** True when public_figure_library has category + is_featured (migration 007). */
 export async function isLibraryDbReady(): Promise<boolean> {
-  if (cached !== null) return cached;
+  if (cachedReady !== null) return cachedReady;
+  const { ready } = await getLibrarySchemaCapabilities();
+  cachedReady = ready;
+  return ready;
+}
 
-  const supabase = createServiceSupabaseClient();
-  const { error } = await supabase
-    .from("public_figure_library")
-    .select("id, category, is_featured")
-    .limit(1);
-
-  cached = !error;
-  return cached;
+/** True when core columns exist — partial seed allowed before 007. */
+export async function isLibraryDbSeedable(): Promise<boolean> {
+  if (cachedSeedable !== null) return cachedSeedable;
+  const { seedable } = await getLibrarySchemaCapabilities();
+  cachedSeedable = seedable;
+  return seedable;
 }
 
 export function resetLibraryDbReadyCache(): void {
-  cached = null;
+  cachedReady = null;
+  cachedSeedable = null;
 }

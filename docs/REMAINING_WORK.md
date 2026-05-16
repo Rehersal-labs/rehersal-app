@@ -39,7 +39,7 @@ Details: [OPENAI.md](./OPENAI.md)
 
 ## Frontend (other teammate)
 
-- [ ] Sign-in UI (Google + magic link)
+- [x] Sign-in UI (Google + magic link) — code in `SignInForm.tsx`; configure [GOOGLE_AUTH.md](./GOOGLE_AUTH.md)
 - [ ] Wire all pages to real APIs (remove mocks)
 - [ ] Mobile polish
 - [ ] Report page polish (highest UX priority)

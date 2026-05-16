@@ -2,8 +2,8 @@
 
 **Audited against:** Full Rehearsal spec (Parts 1–17)  
 **Date:** 2026-05-16  
-**Branch:** `main` (after merge of thanoban backend branch)  
-**Git status:** Clean — all files committed
+**Branch:** `main`  
+**Git status:** Frontend integrated — see `docs/STATUS.md` for live checklist
 
 ---
 
@@ -12,16 +12,16 @@
 | Phase | Description | Status |
 |-------|-------------|--------|
 | A — Foundation | Next.js, Supabase, migrations, types, schemas, lib modules | ✅ Complete |
-| B — Auth + Onboarding | Sign-in, callback, onboarding flow, app shell | ⚠️ Partial — signin ✅, callback ✅, onboarding page ✅, app shell/sidebar ❌ |
-| C — Target Builder | Builder steps, scraper, reconstruction, API routes | ⚠️ Partial — all API routes + lib pipelines ✅, zero UI components ❌ |
-| D — Documents + Context Engine | Upload, embedding, retrieval, API routes | ⚠️ Partial — API routes + lib ✅, zero UI components ❌ |
-| E — Scenarios + Avatar Brief | Configurator, prompts, API routes | ⚠️ Partial — API routes + all 10 prompt templates ✅, zero UI components ❌ |
-| F — Live Session | BP integration, session UI, end flow | ⚠️ Partial — API routes + beyondPresence.ts ✅, zero UI components ❌ |
-| G — Evaluation + Report | Evaluator, report builder, report UI | ⚠️ Partial — API routes + evaluator/reportBuilder ✅, zero UI components ❌ |
-| H — Progress + History | Progress dashboard, charts, history | ❌ Not started — no UI |
-| I — Public Figure Library | Library browser, 15 JSON profiles | ⚠️ Partial — API routes ✅, 1/15 profiles ✅, zero UI ❌ |
-| J — Team Features | Coach dashboard, admin, assignments | ⚠️ Partial — API routes ✅, zero UI ❌ |
-| K — Settings | Solo + team settings pages | ❌ Not started |
+| B — Auth + Onboarding | Sign-in, callback, onboarding flow, app shell | ✅ Complete — enable Google in Supabase for production |
+| C — Target Builder | Builder steps, scraper, reconstruction, API routes | ✅ UI + API — verify E2E with OpenAI |
+| D — Documents + Context Engine | Upload, embedding, retrieval, API routes | ✅ UI + API — verify embed pipeline |
+| E — Scenarios + Avatar Brief | Configurator, prompts, API routes | ✅ UI + API |
+| F — Live Session | BP integration, session UI, end flow | ✅ UI + API — verify live BP call |
+| G — Evaluation + Report | Evaluator, report builder, report UI | ✅ UI + API — verify post-session eval |
+| H — Progress + History | Progress dashboard, charts, history | ✅ UI — verify with session data |
+| I — Public Figure Library | Library browser, 15 JSON profiles | ✅ 15 JSON + UI — run `npm run seed:library` |
+| J — Team Features | Coach dashboard, admin, assignments | ✅ UI + API |
+| K — Settings | Solo + team settings pages | ✅ UI + API |
 | L — Polish | Skeletons, errors, mobile, rate limiting | ❌ Not started |
 | M — Safety + Final QA | Safety audit, E2E testing, demo workspace | ❌ Not started |
 

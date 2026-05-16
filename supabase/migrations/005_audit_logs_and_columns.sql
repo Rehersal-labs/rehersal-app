@@ -1,5 +1,6 @@
 -- Migration 005: audit_logs + schema fixes from MIGRATIONS.md
 
+-- Non-functional stub reserved for post-MVP billing (not wired to UI or logic).
 ALTER TABLE organizations
   ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'free';
 

@@ -139,18 +139,28 @@ export const CommunicationNotesSchema = z.object({
   clarity: z.number().min(0).max(10),
 });
 
-export const EvaluationSchema = z.object({
-  overall_score: z.number().min(0).max(100),
-  target_fit_score: z.number().min(0).max(100),
-  confidence: ConfidenceLevelSchema,
-  summary: z.string(),
-  rubric_scores: z.array(RubricScoreSchema),
-  best_moments: z.array(KeyMomentSchema),
-  weak_moments: z.array(KeyMomentSchema),
-  missed_signals: z.array(MissedSignalSchema),
-  suggested_answers: z.array(SuggestedAnswerSchema),
-  communication_notes: CommunicationNotesSchema,
-});
+export const EvaluationSchema = z
+  .object({
+    overall_score: z.number().min(0).max(100),
+    target_fit_score: z.number().min(0).max(100),
+    confidence: ConfidenceLevelSchema,
+    summary: z.string(),
+    rubric_scores: z.array(RubricScoreSchema),
+    best_moments: z.array(KeyMomentSchema),
+    weak_moments: z.array(KeyMomentSchema),
+    missed_signals: z.array(MissedSignalSchema),
+    suggested_answers: z.array(SuggestedAnswerSchema),
+    communication_notes: CommunicationNotesSchema,
+  })
+  .superRefine((data, ctx) => {
+    const { safe, matches } = validateAISafety(JSON.stringify(data));
+    if (!safe) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Evaluation contains forbidden language: ${matches.join(", ")}`,
+      });
+    }
+  });
 
 export const FeedbackReportSchema = z.object({
   executive_summary: z.string(),
@@ -295,6 +305,15 @@ export const OnboardingSchema = z.object({
     )
     .max(5)
     .optional(),
+});
+
+export const UpdateSettingsSchema = z.object({
+  workspace_name: z.string().min(1).max(100),
+});
+
+export const TeamInviteSchema = z.object({
+  email: z.string().email(),
+  role: RoleSchema,
 });
 
 // ─── Safety validation ────────────────────────────────────────────────────────

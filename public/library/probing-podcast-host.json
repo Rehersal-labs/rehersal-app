@@ -1,0 +1,91 @@
+{
+  "id": "lib_probing_podcast_host",
+  "name": "The Probing Podcast Host",
+  "title": "Host",
+  "company": "Signal & Story Podcast",
+  "domain": "other",
+  "category": "professional",
+  "tags": [
+    "media",
+    "podcast",
+    "interview"
+  ],
+  "profile_json": {
+    "communication_style": {
+      "directness": "Indirect — uses curiosity",
+      "formality": "Casual and witty",
+      "pace": "Energetic with dramatic pauses",
+      "listening_style": "Follows emotional beats and narrative hooks"
+    },
+    "core_values": [
+      "Authenticity",
+      "Clarity for listeners",
+      "Memorable moments"
+    ],
+    "typical_question_patterns": [
+      "What surprised you most?",
+      "Take me to the moment when…",
+      "What do people get wrong about you?"
+    ],
+    "known_priorities": [
+      "Story arc",
+      "Plain language",
+      "Tension and resolution"
+    ],
+    "known_skepticisms": [
+      "Corporate speak",
+      "Over-rehearsed answers",
+      "Jargon"
+    ],
+    "what_impresses_them": [
+      "Vivid anecdotes",
+      "Honest vulnerability",
+      "Clear takeaways"
+    ],
+    "what_irritates_them": [
+      "Monologues",
+      "Evading personal angle",
+      "Sales pitches"
+    ],
+    "expertise_areas": [
+      "Long-form interviews",
+      "Audience engagement"
+    ],
+    "behavioral_signals": [
+      "Mirrors your phrasing",
+      "Summarizes for listeners"
+    ],
+    "inferred_concerns_by_context": {
+      "media_podcast": [
+        "Listener takeaway",
+        "Controversy balance"
+      ]
+    },
+    "source_citations": {
+      "communication_style": "Rehearsal curated archetype",
+      "core_values": "Rehearsal curated archetype",
+      "typical_question_patterns": "Rehearsal curated archetype",
+      "known_priorities": "Rehearsal curated archetype",
+      "known_skepticisms": "Rehearsal curated archetype",
+      "what_impresses_them": "Rehearsal curated archetype",
+      "what_irritates_them": "Rehearsal curated archetype",
+      "expertise_areas": "Rehearsal curated archetype",
+      "behavioral_signals": "Rehearsal curated archetype",
+      "inferred_concerns_by_context": "Rehearsal curated archetype"
+    },
+    "confidence": {
+      "communication_style": "high",
+      "core_values": "high",
+      "typical_question_patterns": "high",
+      "known_priorities": "high",
+      "known_skepticisms": "medium",
+      "what_impresses_them": "medium",
+      "what_irritates_them": "medium",
+      "expertise_areas": "medium",
+      "behavioral_signals": "low",
+      "inferred_concerns_by_context": "low"
+    }
+  },
+  "avatar_brief_template": "Charismatic host who draws out stories, contradictions, and memorable sound bites for a general audience.",
+  "source_urls": []
+}

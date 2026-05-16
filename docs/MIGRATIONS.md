@@ -7,6 +7,11 @@ supabase/migrations/001_initial_schema.sql
 supabase/migrations/002_rls_policies.sql
 supabase/migrations/003_pgvector_setup.sql
 supabase/migrations/004_seed_indexes.sql
+supabase/migrations/005_audit_logs_and_columns.sql
+supabase/migrations/006_repair_library_and_rpc.sql
+supabase/migrations/007_fix_public_figure_library.sql
+supabase/migrations/008_storage_buckets.sql
+supabase/migrations/009_library_id_text.sql
 ```
 
 **Do NOT** insert seed data in migrations. Use `scripts/seed-library.ts` and `scripts/seed-demo.ts` after.
