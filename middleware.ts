@@ -1,21 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = [
-  "/signin",
-  "/callback",
-  "/api/auth/callback",
-  "/api/health",
-  "/api/webhooks",
-];
-
-function isPublicPath(pathname: string): boolean {
-  if (pathname === "/") return true;
-  return PUBLIC_PATHS.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`)
-  );
-}
-
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: { headers: request.headers },
@@ -31,40 +16,19 @@ export async function middleware(request: NextRequest) {
         },
         set(name: string, value: string, options: CookieOptions) {
           request.cookies.set({ name, value, ...options });
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
+          response = NextResponse.next({ request: { headers: request.headers } });
           response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: CookieOptions) {
           request.cookies.set({ name, value: "", ...options });
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
+          response = NextResponse.next({ request: { headers: request.headers } });
           response.cookies.set({ name, value: "", ...options });
         },
       },
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-
-  if (!user && !isPublicPath(pathname) && !pathname.startsWith("/_next")) {
-    const signIn = new URL("/signin", request.url);
-    if (pathname !== "/signin") {
-      signIn.searchParams.set("next", pathname);
-    }
-    return NextResponse.redirect(signIn);
-  }
-
-  if (user && (pathname === "/signin" || pathname === "/")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
+  await supabase.auth.getUser();
   return response;
 }
 

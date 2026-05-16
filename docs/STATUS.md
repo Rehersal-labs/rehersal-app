@@ -18,8 +18,8 @@ Last updated: 2026-05-16 (auto-maintained by dev agents)
 - [x] App shell, dashboard, targets, scenarios, sessions, reports UI
 - [x] Team features (admin, assignments, company docs)
 - [x] Progress dashboard + charts
-- [x] **Sign-in** (Google OAuth + magic link) — `components/auth/SignInForm.tsx`
-- [x] Route protection middleware
+- [ ] Sign-in UI (frontend track)
+- [x] Auth API callbacks — `/api/auth/callback`, `/callback`
 - [x] Full team documentation in `/docs`
 
 ## In progress / needs verification
