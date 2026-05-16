@@ -18,7 +18,7 @@ export default function ScenarioDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <LoadingSkeleton rows={6} />
       </div>
     );
@@ -26,7 +26,7 @@ export default function ScenarioDetailPage() {
 
   if (!scenario) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <p className="text-critical">Scenario not found.</p>
       </div>
     );
@@ -37,7 +37,7 @@ export default function ScenarioDetailPage() {
     scenario.conversation_type;
 
   return (
-    <div className="mx-auto max-w-app space-y-8 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8 animate-fade-in-up">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Badge variant="outline" className="font-mono text-caption uppercase">

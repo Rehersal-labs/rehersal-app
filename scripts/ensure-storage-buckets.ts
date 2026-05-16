@@ -2,7 +2,7 @@
  * Create Supabase Storage buckets required by the app.
  * Usage: npm run storage:setup
  */
-import { createAdminClient } from "../lib/supabaseAdmin";
+import { createServiceSupabaseClient } from "../lib/db";
 
 const BUCKETS = [
   { name: "documents", public: false },
@@ -10,7 +10,7 @@ const BUCKETS = [
 ];
 
 async function main() {
-  const supabase = createAdminClient();
+  const supabase = createServiceSupabaseClient();
 
   for (const bucket of BUCKETS) {
     const { data: existing } = await supabase.storage.getBucket(bucket.name);

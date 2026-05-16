@@ -2,7 +2,7 @@ import { ScenarioConfigurator } from "@/components/scenarios/ScenarioConfigurato
 
 export default function NewScenarioPage() {
   return (
-    <div className="mx-auto max-w-app space-y-8 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8 animate-fade-in-up">
       <div>
         <h1 className="font-display text-display-2 text-foreground-primary">
           New scenario

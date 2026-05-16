@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { PreSessionChecklist } from "@/components/sessions/PreSessionChecklist";
 import { LiveSessionPanel } from "@/components/sessions/LiveSessionPanel";
@@ -11,7 +11,8 @@ import type { Scenario, TargetProfile } from "@/types";
 
 export function SessionPageClient({ sessionId }: { sessionId: string }) {
   const router = useRouter();
-  const [live, setLive] = useState(false);
+  const searchParams = useSearchParams();
+  const [live, setLive] = useState(searchParams.get("live") === "1");
   const { data, isLoading } = useSession(sessionId, {
     refetchInterval: live ? 0 : 5000,
   });
@@ -34,7 +35,7 @@ export function SessionPageClient({ sessionId }: { sessionId: string }) {
 
   if (isLoading || !session || !scenario || !target) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <LoadingSkeleton rows={6} />
       </div>
     );
@@ -42,7 +43,7 @@ export function SessionPageClient({ sessionId }: { sessionId: string }) {
 
   if (session.status === "failed") {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <p className="text-critical">
           {session.error_message ?? "Session failed. Please try again."}
         </p>
@@ -70,13 +71,16 @@ export function SessionPageClient({ sessionId }: { sessionId: string }) {
   }
 
   if (session.status === "ready" || session.status === "created") {
+    const joinUrl = session.join_url ?? undefined;
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <PreSessionChecklist
           scenario={scenario}
           target={target}
           documents={docsData?.documents ?? []}
-          existingSession={{ id: sessionId, joinUrl: session.join_url ?? "" }}
+          existingSession={
+            joinUrl ? { id: sessionId, joinUrl } : { id: sessionId }
+          }
           onSessionReady={() => setLive(true)}
         />
       </div>

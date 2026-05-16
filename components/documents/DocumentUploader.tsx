@@ -5,7 +5,7 @@ import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { DocumentTypeSelector } from "@/components/documents/DocumentTypeSelector";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
 import { useDocuments } from "@/lib/hooks/use-api";
 import { cn } from "@/lib/utils";
 import type { DocType, FileType } from "@/types";

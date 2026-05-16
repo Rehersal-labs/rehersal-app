@@ -12,7 +12,7 @@
 | Auth config (Supabase dashboard) | Google OAuth setup | 20 min |
 | Env vars | Add keys to `.env.local` + Vercel | 10 min |
 | DB setup | Run migrations + seed | 15 min |
-| Code fixes | N1, N2, N3, T1, T2 | 2–4 hrs |
+| Code fixes | N1, N2, N3, T1, T2 | ✅ Done |
 | Phase L — Polish | Mobile, skeletons, errors, rate limiting | 4–8 hrs |
 | Phase M — Safety + QA | Audit, E2E tests, deploy | 4–6 hrs |
 
@@ -99,9 +99,11 @@ npm run backend:ready
 
 ---
 
-## 4. Code Fixes (Before Production)
+## 4. Code Fixes — ✅ Complete
 
-### T1 — PersonalityJSON Schema Too Strict (HIGH — breaks AI reconstruction)
+T1, T2, N1, N2, N3 are done. Build passes (`npm run build`). Details below for reference.
+
+### T1 — PersonalityJSON Schema Too Strict (HIGH — breaks AI reconstruction) ✅
 
 **File:** `lib/schemas.ts` and `types/index.ts`
 
@@ -157,11 +159,9 @@ After deletion, find-and-replace all import sites.
 
 ---
 
-### N3 — Document Upload Route (MEDIUM — verify before demo)
+### N3 — Document Upload Route ✅
 
-Spec says `POST /api/documents` uploads a file. Reality: the upload handler is at `POST /api/documents/upload`.
-
-**Action:** Open `components/documents/DocumentUploader.tsx` and verify the fetch URL is `/api/documents/upload`. If it is, the app works correctly — just update `docs/API_SPEC.md` to document the deviation. If it calls `/api/documents`, fix the URL.
+`DocumentUploader.tsx` uploads to Supabase Storage, then `POST /api/documents` (JSON). Multipart `POST /api/documents/upload` remains for server-side uploads. Documented in `docs/API_SPEC.md`.
 
 ---
 

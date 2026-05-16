@@ -15,7 +15,7 @@ export default function TargetProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <LoadingSkeleton rows={8} />
       </div>
     );
@@ -24,14 +24,14 @@ export default function TargetProfilePage() {
   const target = data?.target;
   if (!target) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <p className="text-critical">Target not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-app space-y-8 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8 animate-fade-in-up">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="font-mono text-caption uppercase text-foreground-tertiary">

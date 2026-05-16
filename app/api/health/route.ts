@@ -1,4 +1,5 @@
 import { jsonOk } from "@/lib/api/http";
+import { createServiceSupabaseClient } from "@/lib/db";
 import { getLLMProvider, isLLMConfigured } from "@/lib/llm";
 import { isLibraryDbReady } from "@/lib/libraryDbReady";
 
@@ -6,6 +7,13 @@ export async function GET() {
   let libraryDb = false;
   try {
     libraryDb = await isLibraryDbReady();
+    if (!libraryDb) {
+      const supabase = createServiceSupabaseClient();
+      const { count, error } = await supabase
+        .from("public_figure_library")
+        .select("id", { count: "exact", head: true });
+      libraryDb = !error && (count ?? 0) > 0;
+    }
   } catch {
     libraryDb = false;
   }

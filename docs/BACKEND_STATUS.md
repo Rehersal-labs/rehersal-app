@@ -45,7 +45,7 @@
 | Webhooks | beyond-presence | ✅ |
 | Health | GET `/api/health` (incl. `openai_configured` flag) | ✅ |
 
-**Note on document upload:** The spec defines `POST /api/documents` for upload. The actual implementation uses `POST /api/documents/upload` (multipart form data handler). Frontend `DocumentUploader.tsx` must call `/api/documents/upload`.
+**Note on document upload:** `DocumentUploader.tsx` uploads files to Supabase Storage, then registers via `POST /api/documents` (JSON with `file_url`). Multipart `POST /api/documents/upload` also exists for direct server uploads.
 
 ---
 
@@ -107,17 +107,9 @@
 
 ---
 
-### P1 — Code Fixes (Required Before Production)
+### P1 — Code Fixes — ✅ Complete (2026-05-16)
 
-| # | Fix | File | Impact |
-|---|-----|------|--------|
-| T1 | PersonalityJSON Zod schema too strict | `lib/schemas.ts`, `types/index.ts` | Reconstruction silently fails |
-| T2 | Chunk size ~4x too small | `lib/embeddings.ts` | Poor retrieval quality |
-| N1 | 3 duplicate Supabase client files | `lib/db.ts`, `lib/supabase/browser.ts`, `lib/supabaseAdmin.ts` | Import inconsistency |
-| N2 | Auth split across 3 files | `lib/auth.ts`, `lib/auth-helpers.ts`, `lib/auth-types.ts` | Confusing imports |
-| N3 | Document upload route mismatch | `app/api/documents/` | Frontend must use `/upload` |
-
-See `fix.md` for exact code changes.
+T1, T2, N1, N2, N3 applied. Build passes. See `fix.md` for history.
 
 ---
 

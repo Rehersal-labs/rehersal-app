@@ -51,4 +51,41 @@
   .amber-glow {
     box-shadow: 0 0 0 1px var(--accent), 0 0 24px var(--highlight-glow);
   }
+
+  /* Glass effects */
+  .glass-panel {
+    @apply backdrop-blur-md bg-white/5 border border-white/10;
+  }
+  .glass-card {
+    @apply backdrop-blur-sm bg-white/[0.03] border border-white/[0.08];
+  }
+
+  /* Gradient text using amber accent */
+  .text-gradient {
+    @apply bg-gradient-to-r from-amber-400 to-orange-300 bg-clip-text text-transparent;
+  }
+
+  /* Subtle mesh dot pattern */
+  .mesh-bg {
+    background-image: radial-gradient(circle at 1px 1px, rgba(200, 135, 42, 0.06) 1px, transparent 0);
+    background-size: 32px 32px;
+  }
+
+  /* Lift on hover */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-0.5;
+  }
+
+  /* Stagger animation delays for list items */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

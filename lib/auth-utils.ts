@@ -1,5 +1,7 @@
 import type { Organization, Role } from "@/types";
 
+/** Client-safe auth helpers (no server imports). */
+
 export function isTeamMode(org: Organization): boolean {
   return org.mode === "team";
 }

@@ -1,5 +1,6 @@
 import { createServiceSupabaseClient } from "@/lib/db";
-import { completion, completionJSON, isOpenAIConfigured } from "@/lib/openai";
+import { isLLMConfigured } from "@/lib/llm";
+import { completion, completionJSON } from "@/lib/openai";
 import {
   buildAvatarBriefPrompt,
   buildReconstructionPrompt,
@@ -12,12 +13,12 @@ import type { PersonalityJSON, TargetSource } from "@/types";
 export async function reconstructTarget(targetId: string): Promise<void> {
   const supabase = createServiceSupabaseClient();
 
-  if (!isOpenAIConfigured()) {
+  if (!isLLMConfigured()) {
     await supabase
       .from("target_profiles")
       .update({
         status: "failed",
-        error_message: "LLM not configured (set GEMINI_API_KEY or OPENAI_API_KEY)",
+        error_message: "LLM not configured (GEMINI_API_KEY or OPENAI_API_KEY)",
       })
       .eq("id", targetId);
     return;

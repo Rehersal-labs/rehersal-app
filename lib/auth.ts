@@ -1,12 +1,16 @@
 import { redirect } from "next/navigation";
-import type { Role } from "@/types";
+import type { AuthSession, Role } from "@/types";
+import { getDevSession, isAuthDisabled } from "@/lib/dev-auth";
 import { createServerSupabaseClient, createServiceSupabaseClient } from "./db";
 
-export type { AuthSession } from "./auth-types";
-export { canManageTeam, isAdmin, isTeamMode } from "./auth-helpers";
-import type { AuthSession } from "./auth-types";
+export type { AuthSession };
+export { canManageTeam, isAdmin, isTeamMode } from "./auth-utils";
 
 export async function getSession(): Promise<AuthSession | null> {
+  if (isAuthDisabled()) {
+    return getDevSession();
+  }
+
   const supabase = createServerSupabaseClient();
   const {
     data: { user: authUser },

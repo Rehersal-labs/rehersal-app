@@ -10,7 +10,7 @@ export function ReportPageClient({
   showCoachTools: boolean;
 }) {
   return (
-    <div className="mx-auto max-w-app p-8">
+    <div className="mx-auto max-w-app p-4 sm:p-8">
       <FeedbackReport reportId={reportId} showCoachTools={showCoachTools} />
     </div>
   );

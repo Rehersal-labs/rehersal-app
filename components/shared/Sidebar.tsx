@@ -14,8 +14,8 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { AuthSession } from "@/lib/auth-types";
-import { canManageTeam, isTeamMode } from "@/lib/auth-helpers";
+import { canManageTeam, isTeamMode } from "@/lib/auth-utils";
+import type { AuthSession } from "@/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const baseNav = [

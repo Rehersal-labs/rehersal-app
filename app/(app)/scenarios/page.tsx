@@ -16,7 +16,7 @@ export default function ScenariosPage() {
   const targets = targetsData?.targets ?? [];
 
   return (
-    <div className="mx-auto max-w-app space-y-8 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8 animate-fade-in-up">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-display-2 text-foreground-primary">

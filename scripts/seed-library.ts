@@ -11,7 +11,7 @@ import {
 } from "../lib/libraryDbReady";
 import { buildLibraryUpsertRow } from "../lib/libraryRows";
 import { getLibrarySchemaCapabilities } from "../lib/librarySchema";
-import { createAdminClient } from "../lib/supabaseAdmin";
+import { createServiceSupabaseClient } from "../lib/db";
 
 async function main() {
   const { columns, ready, seedable, idFormat } =
@@ -44,7 +44,7 @@ async function main() {
     );
   }
 
-  const supabase = createAdminClient();
+  const supabase = createServiceSupabaseClient();
   const libraryDir = path.join(process.cwd(), "public", "library");
   const files = (await readdir(libraryDir)).filter((f) => f.endsWith(".json"));
   let ok = 0;

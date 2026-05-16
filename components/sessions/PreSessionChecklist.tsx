@@ -6,7 +6,7 @@ import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useCreateSession } from "@/lib/hooks/use-api";
+import { useCreateSession, useStartSession } from "@/lib/hooks/use-api";
 import type { Scenario, TargetProfile, UserDocument } from "@/types";
 
 type Check = "mic" | "camera" | "consent";
@@ -23,11 +23,12 @@ export function PreSessionChecklist({
   target: TargetProfile;
   documents: UserDocument[];
   assignmentId?: string;
-  existingSession?: { id: string; joinUrl: string };
+  existingSession?: { id: string; joinUrl?: string };
   onSessionReady: (sessionId: string, joinUrl: string) => void;
 }) {
   const router = useRouter();
   const createSession = useCreateSession();
+  const startSession = useStartSession();
   const [checks, setChecks] = useState<Record<Check, boolean>>({
     mic: false,
     camera: false,
@@ -61,18 +62,27 @@ export function PreSessionChecklist({
       .join(", ") || "No documents attached";
 
   const allReady = checks.mic && checks.camera && checks.consent;
+  const busy = createSession.isPending || startSession.isPending;
 
-  async function startSession() {
-    if (existingSession) {
+  async function handleStart() {
+    if (existingSession?.joinUrl) {
       onSessionReady(existingSession.id, existingSession.joinUrl);
       return;
     }
-    const { session, join_url } = await createSession.mutateAsync({
-      scenario_id: scenario.id,
-      assignment_id: assignmentId,
-    });
-    onSessionReady(session.id, join_url);
-    router.replace(`/sessions/${session.id}`);
+
+    let sessionId = existingSession?.id;
+
+    if (!sessionId) {
+      const { session } = await createSession.mutateAsync({
+        scenario_id: scenario.id,
+        assignment_id: assignmentId,
+      });
+      sessionId = session.id;
+    }
+
+    const { join_url } = await startSession.mutateAsync(sessionId);
+    onSessionReady(sessionId, join_url);
+    router.replace(`/sessions/${sessionId}?live=1`);
   }
 
   return (
@@ -148,10 +158,10 @@ export function PreSessionChecklist({
 
       <Button
         className="w-full"
-        disabled={!allReady || (!existingSession && createSession.isPending)}
-        onClick={() => void startSession()}
+        disabled={!allReady || busy}
+        onClick={() => void handleStart()}
       >
-        {!existingSession && createSession.isPending ? "Starting…" : "Start session"}
+        {busy ? "Starting…" : "Start session"}
       </Button>
     </div>
   );

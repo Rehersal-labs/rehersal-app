@@ -78,10 +78,26 @@ const config: Config = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.6" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-12px)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "0.8" },
+        },
+        "gradient-flow": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
       },
       animation: {
         "fade-in-up": "fade-in-up 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "pulse-amber": "pulseAmber 1.5s ease-in-out infinite",
+        float: "float 7s ease-in-out infinite",
+        "float-slow": "float 10s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
+        "gradient-flow": "gradient-flow 8s ease infinite",
       },
     },
   },

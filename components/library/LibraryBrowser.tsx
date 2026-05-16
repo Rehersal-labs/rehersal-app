@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { LibraryFilterTabs } from "@/components/library/LibraryFilterTabs";
 import { LibraryCard } from "@/components/library/LibraryCard";
@@ -121,6 +122,11 @@ export function LibraryBrowser() {
 
       {isLoading ? (
         <LoadingSkeleton rows={6} />
+      ) : profiles.length === 0 ? (
+        <EmptyState
+          title="No profiles found"
+          description="Try adjusting your search or filters to find a personality to rehearse with."
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {profiles.map((p) => (

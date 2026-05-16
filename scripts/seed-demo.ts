@@ -2,7 +2,7 @@
  * Seeds a demo workspace with sample target + scenario.
  * Usage: npm run seed:demo -- <user_id>
  */
-import { createAdminClient } from "../lib/supabaseAdmin";
+import { createServiceSupabaseClient } from "../lib/db";
 
 async function main() {
   const userId = process.argv[2];
@@ -10,7 +10,7 @@ async function main() {
     throw new Error("Usage: npm run seed:demo -- <supabase_user_id>");
   }
 
-  const supabase = createAdminClient();
+  const supabase = createServiceSupabaseClient();
 
   const { data: user } = await supabase
     .from("users")

@@ -1,7 +1,12 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PAGES = ["/signin", "/callback"];
+const PUBLIC_PAGES = ["/signin", "/callback", "/api/auth/callback"];
+
+function isAuthDisabled(): boolean {
+  return process.env.DISABLE_AUTH === "true";
+}
+
 function getSupabaseUrl(): string {
   const raw = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   return raw.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
@@ -43,6 +48,13 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+
+  if (isAuthDisabled()) {
+    if (pathname === "/signin" || pathname === "/") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    return response;
+  }
 
   if (pathname.startsWith("/api/")) {
     return response;

@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { useTeamMembers } from "@/lib/hooks/use-api";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
 import { toast } from "@/hooks/use-toast";
 import type { Role } from "@/types";
 

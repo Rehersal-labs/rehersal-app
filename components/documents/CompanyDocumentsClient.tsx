@@ -12,7 +12,7 @@ import {
 import { DocumentList } from "@/components/documents/DocumentList";
 import { DocumentUploader } from "@/components/documents/DocumentUploader";
 import { useCompanyDocuments } from "@/lib/hooks/use-api";
-import type { AuthSession } from "@/lib/auth-types";
+import type { AuthSession } from "@/types";
 
 export function CompanyDocumentsClient({ session }: { session: AuthSession }) {
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -20,7 +20,7 @@ export function CompanyDocumentsClient({ session }: { session: AuthSession }) {
   const canUpload = session.membership.role === "owner";
 
   return (
-    <div className="mx-auto max-w-app space-y-8 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8 animate-fade-in-up">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-display-2 text-foreground-primary">

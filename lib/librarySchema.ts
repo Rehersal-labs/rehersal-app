@@ -1,4 +1,4 @@
-import { getSupabaseProjectUrl } from "@/lib/supabaseAdmin";
+import { getSupabaseProjectUrl } from "@/lib/supabase-env";
 
 let cachedColumns: string[] | null = null;
 let cachedIdFormat: "text" | "uuid" | "unknown" | null = null;
@@ -20,7 +20,11 @@ export async function getLibraryTableColumns(): Promise<string[]> {
     definitions?: Record<string, { properties?: Record<string, OpenApiProp> }>;
   };
   const props = spec.definitions?.public_figure_library?.properties ?? {};
-  cachedColumns = Object.keys(props);
+  const columns = Object.keys(props);
+  // Do not cache empty (transient OpenAPI failures during dev cold start)
+  if (columns.length > 0) {
+    cachedColumns = columns;
+  }
   const idProp = props.id;
   cachedIdFormat =
     idProp?.format === "uuid"
@@ -28,7 +32,7 @@ export async function getLibraryTableColumns(): Promise<string[]> {
       : idProp?.type === "string"
         ? "text"
         : "unknown";
-  return cachedColumns;
+  return columns;
 }
 
 export async function getLibraryIdFormat(): Promise<"text" | "uuid" | "unknown"> {

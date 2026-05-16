@@ -19,7 +19,7 @@ export function AssignmentsPageClient({ isCoach }: { isCoach: boolean }) {
 
   if (isCoach) {
     return (
-      <div className="mx-auto max-w-app space-y-8 p-8 animate-fade-in-up">
+      <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8 animate-fade-in-up">
         <div>
           <h1 className="font-display text-display-2 text-foreground-primary">
             Assignments
@@ -38,7 +38,7 @@ export function AssignmentsPageClient({ isCoach }: { isCoach: boolean }) {
   const completed = assignments.filter((a) => a.status === "completed");
 
   return (
-    <div className="mx-auto max-w-app space-y-8 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8 animate-fade-in-up">
       <div>
         <h1 className="font-display text-display-2 text-foreground-primary">
           Your assignments

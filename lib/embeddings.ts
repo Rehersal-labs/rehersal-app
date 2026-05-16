@@ -1,10 +1,12 @@
 import { createServiceSupabaseClient } from "@/lib/db";
-import { embedBatch, isOpenAIConfigured } from "@/lib/openai";
+import { isLLMConfigured } from "@/lib/llm";
+import { embedBatch } from "@/lib/openai";
 import { parseFile } from "@/lib/fileParser";
 import type { FileType } from "@/types";
 
-const CHUNK_CHARS = 512 * 4;
-const OVERLAP_CHARS = 50 * 4;
+/** ~512 tokens at ~4 chars/token; ~50 token overlap */
+const CHUNK_CHARS = 2048;
+const OVERLAP_CHARS = 200;
 
 export function chunkText(text: string): string[] {
   const normalized = text.replace(/\r\n/g, "\n").trim();
@@ -50,7 +52,7 @@ export async function embedDocument(documentId: string): Promise<void> {
 
   if (error || !doc) throw new Error("Document not found");
 
-  if (!isOpenAIConfigured()) {
+  if (!isLLMConfigured()) {
     await supabase
       .from("user_documents")
       .update({ embedding_status: "failed" })

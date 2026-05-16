@@ -1,7 +1,7 @@
 /**
  * Inspect public_figure_library columns via PostgREST OpenAPI
  */
-import { createAdminClient, getSupabaseProjectUrl } from "../lib/supabaseAdmin";
+import { createServiceSupabaseClient, getSupabaseProjectUrl } from "../lib/db";
 
 async function main() {
   const url = getSupabaseProjectUrl();
@@ -29,7 +29,7 @@ async function main() {
     console.log(" ", col);
   }
 
-  const supabase = createAdminClient();
+  const supabase = createServiceSupabaseClient();
   const { count } = await supabase
     .from("public_figure_library")
     .select("*", { count: "exact", head: true });

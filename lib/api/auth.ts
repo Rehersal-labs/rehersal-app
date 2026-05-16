@@ -1,5 +1,6 @@
-import type { AuthSession } from "@/lib/auth";
-import { canManageTeam, getSession } from "@/lib/auth";
+import type { AuthSession } from "@/types";
+import { canManageTeam } from "@/lib/auth-utils";
+import { getSession } from "@/lib/auth";
 import type { Role } from "@/types";
 import { jsonError } from "./http";
 

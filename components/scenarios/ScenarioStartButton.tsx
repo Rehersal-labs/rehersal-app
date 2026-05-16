@@ -1,21 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useCreateSession } from "@/lib/hooks/use-api";
 
+/** Routes to pre-session checklist (consent + media) before creating a BP call. */
 export function ScenarioStartButton({ scenarioId }: { scenarioId: string }) {
-  const router = useRouter();
-  const createSession = useCreateSession();
-
-  async function handleStart() {
-    const { session } = await createSession.mutateAsync({ scenario_id: scenarioId });
-    router.push(`/sessions/${session.id}`);
-  }
-
   return (
-    <Button onClick={handleStart} disabled={createSession.isPending}>
-      Start rehearsal
+    <Button asChild>
+      <Link href={`/scenarios/${scenarioId}/start`}>Start rehearsal</Link>
     </Button>
   );
 }

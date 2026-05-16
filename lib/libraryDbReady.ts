@@ -5,17 +5,17 @@ let cachedSeedable: boolean | null = null;
 
 /** True when public_figure_library has category + is_featured (migration 007). */
 export async function isLibraryDbReady(): Promise<boolean> {
-  if (cachedReady !== null) return cachedReady;
+  if (cachedReady === true) return true;
   const { ready } = await getLibrarySchemaCapabilities();
-  cachedReady = ready;
+  if (ready) cachedReady = true;
   return ready;
 }
 
 /** True when core columns exist — partial seed allowed before 007. */
 export async function isLibraryDbSeedable(): Promise<boolean> {
-  if (cachedSeedable !== null) return cachedSeedable;
+  if (cachedSeedable === true) return true;
   const { seedable } = await getLibrarySchemaCapabilities();
-  cachedSeedable = seedable;
+  if (seedable) cachedSeedable = true;
   return seedable;
 }
 

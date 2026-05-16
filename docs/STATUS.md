@@ -1,8 +1,9 @@
 # Rehearsal — Project Status
 
 **Last updated:** 2026-05-16  
-**Branch:** `main` — clean  
-**Build:** `npm run build` passing (40 routes)
+**Branch:** `main`  
+**Build:** `npm run build` passing (40 routes)  
+**LLM:** Gemini (`LLM_PROVIDER=gemini`, `npm run test:llm` OK)
 
 ---
 
@@ -14,7 +15,9 @@
 - [x] All API routes — 35+ handlers (targets, documents, scenarios, sessions, reports, library, admin, assignments, webhooks)
 - [x] AI pipelines — reconstruction, embeddings, evaluator, report builder (`lib/reconstruction.ts`, `lib/evaluator.ts`, `lib/reportBuilder.ts`)
 - [x] Beyond Presence integration (`lib/beyondPresence.ts`) — test with `npm run test:bp`
-- [x] OpenAI wrapper with safety scan (`lib/openai.ts`) — gated until key set
+- [x] LLM layer — Gemini or OpenAI (`lib/llm.ts`, `npm run test:llm`)
+- [x] Supabase clients consolidated (`lib/db.ts`, `lib/supabase-browser.ts`, `lib/supabase-env.ts`)
+- [x] Auth helpers consolidated (`lib/auth.ts`, `lib/auth-utils.ts`, `AuthSession` in `types/index.ts`)
 
 ### Frontend
 - [x] App shell + role-aware sidebar (solo vs team mode)
@@ -33,10 +36,9 @@
 
 ## Needs Verification / Active Config Required
 
-### Auth Configuration (not code — Supabase dashboard)
-- [ ] Enable Google provider in Supabase → Auth → Providers → Google (paste Client ID + Secret)
-- [ ] Set redirect URLs in Supabase → Auth → URL Configuration: `/callback`
-- [ ] Magic link works once Email provider is enabled (default on) — test by signing in with email
+### Auth Configuration
+- [x] Google OAuth configured and working (Supabase + Google Cloud)
+- [x] Magic link (email provider) — works with default Supabase email
 
 ### Database
 - [ ] Run `supabase/RUN_PENDING.sql` on hosted Supabase instance
@@ -44,10 +46,10 @@
 - [ ] Run `npm run verify:supabase` to confirm all tables + RPC are ready
 
 ### AI Pipelines
-- [ ] Add `OPENAI_API_KEY` → test with `npm run test:openai`
-- [ ] Test reconstruction: `POST /api/targets/:id/reconstruct`
-- [ ] Test document embed: `POST /api/documents/upload` → verify embedding_status becomes `complete`
-- [ ] Test full session loop: create → end → evaluate → GET /reports/:id
+- [x] LLM smoke test — `npm run test:llm` (Gemini embeddings + reconstruction JSON)
+- [ ] E2E reconstruction: `POST /api/targets/:id/reconstruct` via UI
+- [ ] E2E document embed: Storage upload + `POST /api/documents` (JSON) → `embedding_status = complete`
+- [ ] Full session loop: create → end → evaluate → GET /reports/:id
 
 ### Live Avatar Sessions
 - [ ] Add `BEY_API_KEY` + `BEY_AGENT_ID` → test with `npm run test:bp`
@@ -59,19 +61,17 @@
 
 ---
 
-## Open Code Issues (fix before production)
+## Code Fixes (Wave 6) — Done
 
-| Priority | Issue | File(s) |
-|----------|-------|---------|
-| HIGH | T1 — PersonalityJSON Zod schema too strict (breaks reconstruction) | `lib/schemas.ts`, `types/index.ts` |
-| HIGH | N1 — 3 duplicate Supabase client files | `lib/db.ts`, `lib/supabase/browser.ts`, `lib/supabaseAdmin.ts` |
-| MEDIUM | T2 — Chunk size ~4x too small (~128 tokens vs 512) | `lib/embeddings.ts` |
-| MEDIUM | N3 — Document upload at `/api/documents/upload` not `/api/documents` | `app/api/documents/` |
-| MEDIUM | N2 — Auth logic split across 3 files | `lib/auth.ts`, `lib/auth-helpers.ts`, `lib/auth-types.ts` |
-| LOW | S1 — `organizations.plan` column implies billing (excluded from MVP) | `supabase/migrations/005_*` |
-| LOW | S6 — Duplicate auth callback route | `app/(auth)/callback/` + `app/api/auth/callback/` |
+| Fix | Status |
+|-----|--------|
+| T1 — PersonalityJSON schema (partial record keys) | ✅ |
+| T2 — Embedding chunk size 2048/200 chars | ✅ |
+| N1 — Supabase clients → `lib/db.ts` + `lib/supabase-browser.ts` | ✅ |
+| N2 — Auth → `lib/auth.ts` + `lib/auth-utils.ts` | ✅ |
+| N3 — Document upload: Storage + `POST /api/documents` (JSON) — intentional | ✅ |
 
-See [fix.md](../fix.md) for full detail on each issue.
+Remaining low-priority: S1 (`organizations.plan`), S6 (duplicate callback routes). See [fix.md](../fix.md).
 
 ---
 
@@ -102,7 +102,8 @@ See [fix.md](../fix.md) for full detail on each issue.
 npm run setup:check       # validate env vars
 npm run verify:supabase   # confirm DB tables + RPC
 npm run seed:library      # insert 15 library profiles
-npm run test:openai       # smoke test OpenAI
+npm run test:llm          # smoke test Gemini or OpenAI
+npm run test:openai       # alias when LLM_PROVIDER=openai
 npm run test:bp           # smoke test Beyond Presence
 npm run backend:ready     # setup + verify + seed (no OpenAI needed)
 npm run dev               # local dev server
@@ -115,7 +116,7 @@ npm run build             # production build check
 
 | Variable | Blocks |
 |----------|--------|
-| `OPENAI_API_KEY` | Reconstruction, embeddings, evaluation, reports |
+| `GEMINI_API_KEY` or `OPENAI_API_KEY` | Reconstruction, embeddings, evaluation, reports |
 | `BEY_API_KEY` + `BEY_AGENT_ID` | Live avatar sessions |
 | `NEXT_PUBLIC_SUPABASE_URL` + keys | Everything |
 | Google OAuth in Supabase dashboard | Google sign-in |

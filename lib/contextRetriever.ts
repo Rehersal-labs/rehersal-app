@@ -14,7 +14,7 @@ export async function retrieveContext(params: {
   limit?: number;
 }): Promise<string> {
   if (!isOpenAIConfigured()) {
-    return "No uploaded context documents matched this scenario. (Embeddings require OPENAI_API_KEY.)";
+    return "No uploaded context documents matched this scenario. (LLM API key not configured — set GEMINI_API_KEY or OPENAI_API_KEY.)";
   }
 
   const supabase = createServiceSupabaseClient();

@@ -47,11 +47,12 @@
 
 | Step | Status | Notes |
 |------|--------|-------|
-| Code fixes (T1, T2, N1, N2, N3) | ❌ Pending | See fix.md |
-| Google OAuth config in Supabase | ❌ Pending | Dashboard-only step |
-| Run migrations on hosted Supabase | ❌ Pending | `supabase/RUN_PENDING.sql` |
-| Seed library | ❌ Pending | `npm run seed:library` |
-| OpenAI E2E test | ❌ Pending | `npm run test:openai` |
+| Code fixes (T1, T2, N1, N2, N3) | ✅ Done | Build passes |
+| Google OAuth config in Supabase | ✅ Done | User configured |
+| Run migrations on hosted Supabase | ⚠️ Pending | Paste `supabase/RUN_PENDING.sql` (009+007+008) |
+| Seed library | ⚠️ Blocked on migrations | `npm run seed:library` |
+| LLM smoke test | ✅ Done | `npm run test:llm` (Gemini) |
+| AI E2E via UI | ❌ Pending | reconstruct, embed, evaluate |
 | BP live session test | ❌ Pending | `npm run test:bp` |
 | Phase L — Polish | ❌ Pending | Mobile, skeletons, errors |
 | Phase M — Safety audit + RLS test | ❌ Pending | See REMAINING_WORK.md |
@@ -65,9 +66,9 @@
 | # | Checkpoint | Status | How to verify |
 |---|------------|--------|--------------|
 | CP1 | Migrations + types compile | ✅ Done | `npm run verify:supabase` |
-| CP2 | User can sign in and reach dashboard | ⚠️ Needs Google config | Visit `/signin` → Google OAuth |
-| CP3 | Target reconstruction returns valid PersonalityJSON | ❌ Needs OpenAI key | `POST /api/targets/:id/reconstruct` |
-| CP4 | Document upload embeds chunks in pgvector | ❌ Needs OpenAI key | `POST /api/documents/upload` |
+| CP2 | User can sign in and reach dashboard | ✅ Done | Google OAuth + magic link |
+| CP3 | Target reconstruction returns valid PersonalityJSON | ⚠️ Needs E2E | `POST /api/targets/:id/reconstruct` |
+| CP4 | Document upload embeds chunks in pgvector | ⚠️ Needs E2E | Storage + `POST /api/documents` |
 | CP5 | BP `createCall` returns join URL | ❌ Needs BP keys | `npm run test:bp` |
 | CP6 | Full loop: session → report in < 60s | ❌ Needs all keys | Manual E2E test |
 | CP7 | Solo hides team UI; team shows pulse + assignments | ✅ Done | Verify with two different org modes |

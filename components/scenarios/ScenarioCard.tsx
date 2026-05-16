@@ -21,7 +21,7 @@ export function ScenarioCard({
     scenario.conversation_type;
 
   return (
-    <Card className="flex flex-col border border-border p-4 transition-colors hover:border-border-default">
+    <Card className="glass-card flex flex-col border border-border p-4 transition-colors hover:border-border-default hover-lift">
       <Badge variant="outline" className="w-fit font-mono text-caption uppercase">
         {typeLabel}
       </Badge>

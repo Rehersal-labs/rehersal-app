@@ -11,7 +11,7 @@ export function AdminPageClient() {
   const { data, isLoading } = useTeamReport();
 
   return (
-    <div className="mx-auto max-w-app space-y-10 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-10 p-4 sm:p-8 animate-fade-in-up">
       <div>
         <h1 className="font-display text-display-2 text-foreground-primary">Admin</h1>
         <p className="mt-2 text-body text-foreground-secondary">

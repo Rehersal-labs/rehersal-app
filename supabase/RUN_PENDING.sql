@@ -1,7 +1,24 @@
 -- =============================================================================
 -- Run this in Supabase → SQL Editor (fixes verify:supabase failures)
--- Combines migrations 007 + 008
+-- Combines migrations 009 + 007 + 008
 -- =============================================================================
+
+-- ─── 009: public_figure_library.id must be TEXT (lib_* slugs from JSON seed) ─
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'public_figure_library'
+      AND column_name = 'id'
+      AND udt_name = 'uuid'
+  ) THEN
+    ALTER TABLE public_figure_library
+      ALTER COLUMN id TYPE TEXT USING id::text;
+  END IF;
+END $$;
 
 -- ─── 007: public_figure_library columns ─────────────────────────────────────
 

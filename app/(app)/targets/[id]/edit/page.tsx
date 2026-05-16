@@ -15,7 +15,7 @@ export default function EditTargetPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <LoadingSkeleton rows={6} />
       </div>
     );
@@ -24,7 +24,7 @@ export default function EditTargetPage() {
   const personality = data?.target?.personality_json;
   if (!personality) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <p className="text-foreground-secondary">No personality profile to edit yet.</p>
       </div>
     );
@@ -37,7 +37,7 @@ export default function EditTargetPage() {
   }
 
   return (
-    <div className="mx-auto max-w-app space-y-8 p-8">
+    <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8">
       <h1 className="font-display text-h1 text-foreground-primary">Edit target</h1>
       <PersonalityProfileCard
         personality={personality}

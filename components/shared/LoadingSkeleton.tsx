@@ -31,7 +31,7 @@ export function LoadingSkeleton({
 
   if (variant === "page") {
     return (
-      <div className="mx-auto max-w-app space-y-6 p-8">
+      <div className="mx-auto max-w-app space-y-6 p-4 sm:p-8">
         <Skeleton className="h-10 w-64" />
         <Skeleton className="h-5 w-96" />
         <div className="grid gap-4 md:grid-cols-3">

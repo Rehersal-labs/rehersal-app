@@ -60,7 +60,7 @@ export function DashboardContent({
 
   if (isNewUser) {
     return (
-      <div className="mx-auto max-w-app space-y-10 p-8 animate-fade-in-up">
+      <div className="mx-auto max-w-app space-y-10 p-4 sm:p-8 animate-fade-in-up">
         <div>
           <h1 className="font-display text-display-2 text-foreground-primary">
             Welcome, {userName}.
@@ -100,7 +100,7 @@ export function DashboardContent({
   }
 
   return (
-    <div className="mx-auto max-w-app space-y-10 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-10 p-4 sm:p-8 animate-fade-in-up">
       {isTeam && isCoach && <TeamPulseBand />}
 
       <div>

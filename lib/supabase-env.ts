@@ -1,18 +1,18 @@
-import { createBrowserClient } from "@supabase/ssr";
+/** Supabase env helpers safe for any runtime (no next/headers). */
 
-function getSupabaseUrl(): string {
+export function getSupabaseUrl(): string {
   const raw = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!raw) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
   return raw.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
 }
 
-function getSupabaseAnonKey(): string {
+export function getSupabaseAnonKey(): string {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!key) throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY");
   return key;
 }
 
-/** Browser client for client components */
-export function createBrowserSupabaseClient() {
-  return createBrowserClient(getSupabaseUrl(), getSupabaseAnonKey());
+/** Project root URL (no trailing slash, no /rest/v1) */
+export function getSupabaseProjectUrl(): string {
+  return getSupabaseUrl();
 }

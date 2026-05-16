@@ -1,8 +1,5 @@
 import { requireAuth } from "@/lib/api/auth";
 import { jsonError, jsonOk, parseJsonBody } from "@/lib/api/http";
-import { buildAvatarSystemPrompt } from "@/lib/avatarBriefBuilder";
-import { createCall } from "@/lib/beyondPresence";
-import { retrieveContext } from "@/lib/contextRetriever";
 import { createServiceSupabaseClient } from "@/lib/db";
 import { CreateSessionSchema } from "@/lib/schemas";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
@@ -12,6 +9,8 @@ import type {
   SessionStatus,
   TargetProfile,
 } from "@/types";
+
+// BP call is started in POST /api/sessions/[id]/start after consent checklist.
 
 export async function GET(request: Request) {
   const auth = await requireAuth();
@@ -85,7 +84,7 @@ export async function POST(request: Request) {
 
   const { data: scenario, error: scenarioError } = await supabase
     .from("scenarios")
-    .select("*")
+    .select("id, target_profile_id")
     .eq("id", parsed.data.scenario_id)
     .eq("org_id", auth.session.organization.id)
     .single();
@@ -96,7 +95,7 @@ export async function POST(request: Request) {
 
   const { data: target, error: targetError } = await supabase
     .from("target_profiles")
-    .select("*")
+    .select("id, status")
     .eq("id", scenario.target_profile_id)
     .single();
 
@@ -107,19 +106,6 @@ export async function POST(request: Request) {
   if (target.status !== "complete") {
     return jsonError("Target profile must be complete before starting a session", 400);
   }
-
-  const userContext = await retrieveContext({
-    orgId: auth.session.organization.id,
-    userId: auth.session.user.id,
-    goal: scenario.goal,
-    includeCompany: auth.session.organization.mode === "team",
-  });
-
-  const systemPrompt = buildAvatarSystemPrompt({
-    target: target as TargetProfile,
-    scenario: scenario as Scenario,
-    userContextBlock: userContext,
-  });
 
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
@@ -138,55 +124,12 @@ export async function POST(request: Request) {
     return jsonError(sessionError?.message ?? "Failed to create session", 500);
   }
 
-  try {
-    const call = await createCall({
-      userName: auth.session.user.name ?? auth.session.user.email,
-      systemPromptOverride: systemPrompt,
-      tags: {
-        source: "rehearsal",
-        session_id: session.id,
-      },
-    });
-
-    const { data: readySession, error: updateError } = await supabase
-      .from("sessions")
-      .update({
-        bey_call_id: call.id,
-        bey_agent_id: call.agent_id,
-        join_url: call.join_url,
-        system_prompt_used: systemPrompt,
-        status: "ready",
-        started_at: new Date().toISOString(),
-      })
-      .eq("id", session.id)
-      .select()
-      .single();
-
-    if (updateError || !readySession) {
-      throw updateError ?? new Error("Failed to update session");
-    }
-
-    const { system_prompt_used: _prompt, ...safeSession } = readySession;
-
-    return jsonOk(
-      {
-        session: safeSession,
-        join_url: call.join_url,
-      },
-      201
-    );
-  } catch (e) {
-    await supabase
-      .from("sessions")
-      .update({
-        status: "failed",
-        error_message: e instanceof Error ? e.message : "Failed to start call",
-      })
-      .eq("id", session.id);
-
-    return jsonError(
-      e instanceof Error ? e.message : "Failed to create Beyond Presence call",
-      500
-    );
-  }
+  return jsonOk(
+    {
+      session,
+      message:
+        "Session created. Complete the pre-session checklist, then POST /api/sessions/:id/start.",
+    },
+    201
+  );
 }

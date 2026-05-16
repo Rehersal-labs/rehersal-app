@@ -20,7 +20,7 @@ export default function LibraryDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <LoadingSkeleton rows={8} />
       </div>
     );
@@ -28,7 +28,7 @@ export default function LibraryDetailPage() {
 
   if (!profile) {
     return (
-      <div className="mx-auto max-w-app p-8">
+      <div className="mx-auto max-w-app p-4 sm:p-8">
         <p className="text-critical">Profile not found.</p>
       </div>
     );
@@ -40,7 +40,7 @@ export default function LibraryDetailPage() {
   }
 
   return (
-    <div className="mx-auto max-w-app space-y-8 p-8 animate-fade-in-up">
+    <div className="mx-auto max-w-app space-y-8 p-4 sm:p-8 animate-fade-in-up">
       {profile.category === "real_figure" && (
         <div className="rounded-lg border border-border bg-surface-elevated p-4 text-small text-foreground-secondary">
           This profile is synthesized from public information. This is a simulation for

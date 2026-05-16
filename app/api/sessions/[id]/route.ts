@@ -37,7 +37,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
         .select("*")
         .eq("session_id", params.id)
         .order("sequence", { ascending: true }),
-      session.status === "report_ready"
+      ["report_ready", "evaluating", "ended"].includes(session.status)
         ? supabase
             .from("feedback_reports")
             .select("id")

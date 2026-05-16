@@ -118,6 +118,12 @@ export interface Membership {
   created_at: string;
 }
 
+export interface AuthSession {
+  user: User;
+  membership: Membership;
+  organization: Organization;
+}
+
 export interface TargetProfile {
   id: string;
   org_id: string;

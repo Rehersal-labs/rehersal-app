@@ -3,7 +3,7 @@
  * Usage: npm run verify:supabase
  */
 import { getLibrarySchemaCapabilities } from "../lib/librarySchema";
-import { createAdminClient, getSupabaseProjectUrl } from "../lib/supabaseAdmin";
+import { createServiceSupabaseClient, getSupabaseProjectUrl } from "../lib/db";
 
 const REQUIRED_LIBRARY_COLUMNS = [
   "category",
@@ -23,7 +23,7 @@ async function main() {
     console.log("Note: use project URL only (no /rest/v1) in .env.local\n");
   }
 
-  const supabase = createAdminClient();
+  const supabase = createServiceSupabaseClient();
   let failed = false;
 
   const tables = [

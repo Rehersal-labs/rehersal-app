@@ -1,18 +1,17 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import {
+  getSupabaseAnonKey,
+  getSupabaseProjectUrl,
+  getSupabaseUrl,
+} from "./supabase-env";
 
-function getSupabaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!raw) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
-  // Accept project URL only — strip accidental /rest/v1 paste from dashboard
-  return raw.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
-}
+export { getSupabaseProjectUrl };
 
-function getSupabaseAnonKey(): string {
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!key) throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY");
-  return key;
+/** @deprecated Use createServiceSupabaseClient */
+export function createAdminClient(): SupabaseClient {
+  return createServiceSupabaseClient();
 }
 
 /** Server client for Server Components and Route Handlers (respects RLS) */

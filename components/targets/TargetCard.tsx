@@ -16,7 +16,7 @@ export function TargetCard({
   onLaunch?: (id: string) => void;
 }) {
   return (
-    <Card className="flex flex-col border border-border p-4 transition-colors hover:border-border-default">
+    <Card className="glass-card flex flex-col border border-border p-4 transition-colors hover:border-border-default hover-lift">
       <Badge variant="outline" className="w-fit font-mono text-caption uppercase">
         {target.domain}
       </Badge>

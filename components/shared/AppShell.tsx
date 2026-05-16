@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Menu } from "lucide-react";
-import type { AuthSession } from "@/lib/auth-types";
+import type { AuthSession } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Sidebar } from "./Sidebar";
@@ -22,6 +22,11 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen">
+      {/* Ambient background orbs */}
+      <div className="pointer-events-none fixed inset-0 mesh-bg opacity-30 -z-10" />
+      <div className="pointer-events-none fixed -left-32 top-20 h-72 w-72 rounded-full bg-amber-500/10 blur-[100px] animate-float -z-10" />
+      <div className="pointer-events-none fixed -right-32 bottom-20 h-80 w-80 rounded-full bg-orange-600/10 blur-[120px] animate-float-slow -z-10" />
+      <div className="pointer-events-none fixed left-1/2 top-1/3 h-56 w-56 -translate-x-1/2 rounded-full bg-yellow-500/5 blur-[80px] animate-glow-pulse -z-10" />
       <Sidebar
         session={session}
         pendingAssignments={pendingAssignments}

@@ -264,11 +264,26 @@ export function useCreateSession() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (body: { scenario_id: string; assignment_id?: string }) =>
-      apiFetch<{ session: Session; join_url: string }>("/api/sessions", {
+      apiFetch<{ session: Session; message?: string }>("/api/sessions", {
         method: "POST",
         body: JSON.stringify(body),
       }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["sessions"] }),
+  });
+}
+
+export function useStartSession() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (sessionId: string) =>
+      apiFetch<{ session: Session; join_url: string }>(
+        `/api/sessions/${sessionId}/start`,
+        { method: "POST" }
+      ),
+    onSuccess: (_data, sessionId) => {
+      qc.invalidateQueries({ queryKey: ["sessions"] });
+      qc.invalidateQueries({ queryKey: ["session", sessionId] });
+    },
   });
 }
 

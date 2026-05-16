@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, Mail } from "lucide-react";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,9 +34,11 @@ function GoogleIcon({ className }: { className?: string }) {
 }
 
 function getCallbackUrl(next?: string | null): string {
+  // Prefer current browser origin so OAuth works on :3000 or :3001
   const base =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    (typeof window !== "undefined" ? window.location.origin : "");
+    (typeof window !== "undefined" ? window.location.origin : "") ||
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+    "";
   const url = new URL("/callback", base);
   if (next && next.startsWith("/") && !next.startsWith("//")) {
     url.searchParams.set("next", next);
@@ -47,17 +49,20 @@ function getCallbackUrl(next?: string | null): string {
 export function SignInForm() {
   const searchParams = useSearchParams();
   const authError = searchParams.get("error") === "auth";
+  const authReason = searchParams.get("reason");
   const nextPath = searchParams.get("next");
 
   const [emailExpanded, setEmailExpanded] = useState(false);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState<"google" | "email" | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(
-    authError
-      ? "Sign-in failed. Check Google is enabled in Supabase and redirect URLs include /callback (see docs/GOOGLE_AUTH.md)."
-      : null
-  );
+  const [error, setError] = useState<string | null>(() => {
+    if (!authError) return null;
+    if (authReason) {
+      return `Sign-in failed: ${decodeURIComponent(authReason)}. Add your app URL + /callback in Supabase → Authentication → URL Configuration.`;
+    }
+    return "Sign-in failed. Enable Google in Supabase and add /callback to redirect URLs (see docs/GOOGLE_AUTH.md).";
+  });
 
   async function signInWithGoogle() {
     setLoading("google");
