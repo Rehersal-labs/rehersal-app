@@ -24,12 +24,16 @@
 | [SUCCESS_CRITERIA.md](./SUCCESS_CRITERIA.md) | MVP definition of done |
 | [SAFETY.md](./SAFETY.md) | AI safety rules |
 | [SETUP.md](./SETUP.md) | Clone, env, Supabase, deploy |
+| [CONFIG.md](./CONFIG.md) | **Complete env + service checklist** |
 | [REPO_STRUCTURE.md](./REPO_STRUCTURE.md) | Folder layout |
 
 ### Member 1 — Backend / platform
 
 | Doc | What's inside |
 |-----|----------------|
+| [REMAINING_WORK.md](./REMAINING_WORK.md) | **What's left for the whole team** |
+| [BACKEND_STATUS.md](./BACKEND_STATUS.md) | Backend done + what's left |
+| [OPENAI.md](./OPENAI.md) | OpenAI pipelines (test when key added) |
 | [API_SPEC_FULL.md](./API_SPEC_FULL.md) | **All endpoints + JSON examples** |
 | [API_SPEC.md](./API_SPEC.md) | Route index (quick lookup) |
 | [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | Tables & enums |
@@ -71,6 +75,11 @@
 When docs and code disagree, **fix code or update docs in the same PR**.
 
 ---
+
+## Agent / handoff
+
+- [AGENTS.md](../AGENTS.md) — start here for a new Cursor session  
+- [STATUS.md](./STATUS.md) — what’s done and what’s next  
 
 ## Quick links
 

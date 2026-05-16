@@ -27,6 +27,7 @@ All routes: `app/api/`. Validate with `lib/schemas.ts`. Auth via `lib/auth.ts`.
 | Method | Path |
 |--------|------|
 | GET, POST | `/api/documents` |
+| POST | `/api/documents/upload` — multipart: `file`, `doc_type`, optional `is_company_shared` |
 | DELETE | `/api/documents/[id]` |
 | POST | `/api/documents/embed` |
 
@@ -76,8 +77,15 @@ All routes: `app/api/`. Validate with `lib/schemas.ts`. Auth via `lib/auth.ts`.
 |--------|------|
 | GET | `/api/admin/sessions` |
 | GET | `/api/admin/team-report` |
+| GET | `/api/team/members` |
 | GET, POST | `/api/assignments` |
 | POST | `/api/coach-comments` |
+
+## Settings
+
+| Method | Path |
+|--------|------|
+| GET | `/api/settings/export` — owner only, JSON download |
 
 ## Webhooks
 

@@ -1,0 +1,42 @@
+import { NextResponse } from "next/server";
+import { createServerSupabaseClient } from "@/lib/db";
+import { provisionNewUser } from "@/lib/auth";
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url);
+  const code = searchParams.get("code");
+  const nextParam = searchParams.get("next");
+
+  if (!code) {
+    return NextResponse.redirect(`${origin}/signin?error=auth`);
+  }
+
+  const supabase = createServerSupabaseClient();
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error || !data.user) {
+    return NextResponse.redirect(`${origin}/signin?error=auth`);
+  }
+
+  const { data: existingUser } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", data.user.id)
+    .maybeSingle();
+
+  let isNewUser = false;
+  if (!existingUser) {
+    isNewUser = true;
+    await provisionNewUser({
+      userId: data.user.id,
+      email: data.user.email ?? "",
+      name: data.user.user_metadata?.full_name,
+      avatarUrl: data.user.user_metadata?.avatar_url,
+    });
+  }
+
+  const next =
+    nextParam ?? (isNewUser ? "/onboarding" : "/dashboard");
+
+  return NextResponse.redirect(`${origin}${next}`);
+}
