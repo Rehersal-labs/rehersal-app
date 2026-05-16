@@ -3,7 +3,7 @@ import { completionJSON } from "@/lib/openai";
 import { retrieveContext } from "@/lib/contextRetriever";
 import { buildEvaluatorPrompt, PROMPT_VERSION } from "@/lib/prompts";
 import { buildFeedbackReport } from "@/lib/reportBuilder";
-import { EvaluationSchema } from "@/lib/schemas";
+import { EvaluationSchema, validateAISafety } from "@/lib/schemas";
 import { formatTranscript, syncSessionTurns } from "@/lib/sessionTurns";
 import type {
   Organization,
@@ -95,6 +95,13 @@ export async function evaluateSession(sessionId: string): Promise<void> {
       }),
       EvaluationSchema
     );
+
+    const evalSafety = validateAISafety(JSON.stringify(evaluation));
+    if (!evalSafety.safe) {
+      throw new Error(
+        `Evaluation blocked by safety filter: ${evalSafety.matches.join(", ")}`
+      );
+    }
 
     await supabase.from("evaluations").upsert(
       {

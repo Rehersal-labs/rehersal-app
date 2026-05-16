@@ -1,7 +1,11 @@
 import { createServiceSupabaseClient } from "@/lib/db";
 import { completionJSON } from "@/lib/openai";
 import { buildReportBuilderPrompt, PROMPT_VERSION } from "@/lib/prompts";
-import { EvaluationSchema, FeedbackReportSchema } from "@/lib/schemas";
+import {
+  EvaluationSchema,
+  FeedbackReportSchema,
+  validateAISafety,
+} from "@/lib/schemas";
 import type { z } from "zod";
 import type { ConversationType, FeedbackReportJSON } from "@/types";
 
@@ -39,12 +43,21 @@ export async function buildFeedbackReport(
 
   const report_json: FeedbackReportJSON = {
     ...reportPayload,
+    executive_summary:
+      reportPayload.executive_summary || evaluation.summary,
     overall_score: evaluation.overall_score,
     target_fit_score: evaluation.target_fit_score,
     conversation_type: scenario.conversation_type,
     target_name: target.name,
     session_date: session.ended_at ?? session.created_at,
   };
+
+  const reportSafety = validateAISafety(JSON.stringify(report_json));
+  if (!reportSafety.safe) {
+    throw new Error(
+      `Report blocked by safety filter: ${reportSafety.matches.join(", ")}`
+    );
+  }
 
   const { data: report, error } = await supabase
     .from("feedback_reports")

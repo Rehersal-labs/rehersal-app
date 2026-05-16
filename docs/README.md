@@ -31,7 +31,9 @@
 
 | Doc | What's inside |
 |-----|----------------|
-| [BACKEND_STATUS.md](./BACKEND_STATUS.md) | **What's done + what's left (start here)** |
+| [REMAINING_WORK.md](./REMAINING_WORK.md) | **What's left for the whole team** |
+| [BACKEND_STATUS.md](./BACKEND_STATUS.md) | Backend done + what's left |
+| [OPENAI.md](./OPENAI.md) | OpenAI pipelines (test when key added) |
 | [API_SPEC_FULL.md](./API_SPEC_FULL.md) | **All endpoints + JSON examples** |
 | [API_SPEC.md](./API_SPEC.md) | Route index (quick lookup) |
 | [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | Tables & enums |

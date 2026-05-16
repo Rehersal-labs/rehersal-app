@@ -1,5 +1,5 @@
 import { createServiceSupabaseClient } from "@/lib/db";
-import { completion, completionJSON } from "@/lib/openai";
+import { completion, completionJSON, isOpenAIConfigured } from "@/lib/openai";
 import {
   buildAvatarBriefPrompt,
   buildReconstructionPrompt,
@@ -11,6 +11,17 @@ import type { TargetSource } from "@/types";
 
 export async function reconstructTarget(targetId: string): Promise<void> {
   const supabase = createServiceSupabaseClient();
+
+  if (!isOpenAIConfigured()) {
+    await supabase
+      .from("target_profiles")
+      .update({
+        status: "failed",
+        error_message: "OPENAI_API_KEY not configured",
+      })
+      .eq("id", targetId);
+    return;
+  }
 
   await supabase
     .from("target_profiles")

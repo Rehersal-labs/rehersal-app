@@ -20,6 +20,7 @@
     "db:repair:007": "tsx --env-file=.env.local scripts/run-sql-file.ts supabase/migrations/007_fix_public_figure_library.sql",
     "smoke:health": "tsx --env-file=.env.local scripts/smoke-health.ts",
     "backend:ready": "tsx --env-file=.env.local scripts/backend-ready.ts",
+    "test:openai": "tsx --env-file=.env.local scripts/test-openai.ts",
     "test:bp": "tsx --env-file=.env.local scripts/test-bp-call.ts"
   },
   "dependencies": {

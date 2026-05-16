@@ -94,12 +94,15 @@ AI routes return **503** `OPENAI_NOT_CONFIGURED` until key is set.
 | 2 | Backend readiness | `npm run backend:ready` |
 | 3 | Verify health | `GET /api/health` shows `openai_configured: false` until key added |
 
-### P0 — After OpenAI key added
+### P0 — After OpenAI key added (test later)
 
 | # | Task | How |
 |---|------|-----|
-| 4 | Add `OPENAI_API_KEY` | `.env.local` — enables reconstruct, embed, evaluate |
-| 5 | Test AI pipelines | reconstruct → session → evaluate |
+| 4 | Add `OPENAI_API_KEY` | `.env.local` |
+| 5 | Smoke test | `npm run test:openai` |
+| 6 | Full AI E2E | See [OPENAI.md](./OPENAI.md) |
+
+**OpenAI code is implemented** in `lib/reconstruction.ts`, `lib/embeddings.ts`, `lib/evaluator.ts`, `lib/reportBuilder.ts`, `lib/prompts.ts`.
 
 ### P1 — Verify pipelines (manual / scripts)
 
