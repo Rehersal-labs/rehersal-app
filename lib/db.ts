@@ -4,9 +4,10 @@ import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 function getSupabaseUrl(): string {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!url) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
-  return url;
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!raw) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
+  // Accept project URL only — strip accidental /rest/v1 paste from dashboard
+  return raw.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
 }
 
 function getSupabaseAnonKey(): string {

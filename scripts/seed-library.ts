@@ -4,17 +4,11 @@
  */
 import { readdir, readFile } from "fs/promises";
 import path from "path";
-import { createClient } from "@supabase/supabase-js";
 import { LibraryProfileSchema } from "../lib/schemas";
+import { createAdminClient } from "../lib/supabaseAdmin";
 
 async function main() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-  }
-
-  const supabase = createClient(url, key);
+  const supabase = createAdminClient();
   const libraryDir = path.join(process.cwd(), "public", "library");
   const files = (await readdir(libraryDir)).filter((f) => f.endsWith(".json"));
 
