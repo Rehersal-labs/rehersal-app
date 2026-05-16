@@ -1,6 +1,11 @@
 import { requireAuth } from "@/lib/api/auth";
 import { jsonError, jsonOk } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
+import {
+  filterLibraryProfiles,
+  loadLibraryFromFiles,
+} from "@/lib/loadLibraryProfiles";
+import { isLibraryDbReady } from "@/lib/libraryDbReady";
 import type { Domain, LibraryCategory } from "@/types";
 
 export async function GET(request: Request) {
@@ -13,6 +18,16 @@ export async function GET(request: Request) {
   const search = searchParams.get("search");
   const sort = searchParams.get("sort") ?? "most_used";
   const featured = searchParams.get("featured") === "true";
+
+  const filterParams = { category, domain, search, featured, sort };
+
+  if (!(await isLibraryDbReady())) {
+    const profiles = filterLibraryProfiles(
+      await loadLibraryFromFiles(),
+      filterParams
+    );
+    return jsonOk({ profiles, total: profiles.length, source: "files" as const });
+  }
 
   const supabase = createServiceSupabaseClient();
   let query = supabase
@@ -43,7 +58,13 @@ export async function GET(request: Request) {
   }
 
   const { data, error, count } = await query;
-  if (error) return jsonError(error.message, 500);
+  if (error) {
+    const profiles = filterLibraryProfiles(
+      await loadLibraryFromFiles(),
+      filterParams
+    );
+    return jsonOk({ profiles, total: profiles.length, source: "files" as const });
+  }
 
   return jsonOk({ profiles: data ?? [], total: count ?? 0 });
 }

@@ -11,7 +11,10 @@
     "seed:demo": "tsx --env-file=.env.local scripts/seed-demo.ts",
     "embed:docs": "tsx --env-file=.env.local scripts/embed-existing-docs.ts",
     "verify:supabase": "tsx --env-file=.env.local scripts/verify-supabase.ts",
-    "inspect:library": "tsx --env-file=.env.local scripts/inspect-library-table.ts"
+    "inspect:library": "tsx --env-file=.env.local scripts/inspect-library-table.ts",
+    "storage:setup": "tsx --env-file=.env.local scripts/ensure-storage-buckets.ts",
+    "db:sql": "tsx --env-file=.env.local scripts/run-sql-file.ts",
+    "db:repair:007": "tsx --env-file=.env.local scripts/run-sql-file.ts supabase/migrations/007_fix_public_figure_library.sql"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -57,11 +60,13 @@
   "devDependencies": {
     "@types/node": "^20.17.10",
     "@types/pdf-parse": "^1.1.4",
+    "@types/pg": "^8.20.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.21",
+    "pg": "^8.20.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.2",
