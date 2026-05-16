@@ -27,6 +27,7 @@ All routes: `app/api/`. Validate with `lib/schemas.ts`. Auth via `lib/auth.ts`.
 | Method | Path |
 |--------|------|
 | GET, POST | `/api/documents` |
+| POST | `/api/documents/upload` — multipart: `file`, `doc_type`, optional `is_company_shared` |
 | DELETE | `/api/documents/[id]` |
 | POST | `/api/documents/embed` |
 

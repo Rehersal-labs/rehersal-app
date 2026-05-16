@@ -122,9 +122,25 @@ Async: runs `reconstructTarget()`. Client polls target until `status` is `comple
 
 **Response 200:** `{ "documents": UserDocument[] }`
 
+### `POST /api/documents/upload` (recommended)
+
+**Content-Type:** `multipart/form-data`
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `file` | yes | PDF, DOCX, or TXT (max 50MB) |
+| `doc_type` | yes | `my_background`, `opportunity`, etc. |
+| `is_company_shared` | no | `true` for team company docs (owner only) |
+
+Server uploads to Storage `documents` bucket, extracts text, creates row, starts embedding async.
+
+**Response 201:** `{ "document": UserDocument }`
+
+---
+
 ### `POST /api/documents`
 
-**Content-Type:** `multipart/form-data` OR JSON after client upload to Storage:
+**Content-Type:** JSON (when file already in Storage):
 
 ```json
 {

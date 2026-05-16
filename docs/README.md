@@ -31,6 +31,7 @@
 
 | Doc | What's inside |
 |-----|----------------|
+| [BACKEND_STATUS.md](./BACKEND_STATUS.md) | **What's done + what's left (start here)** |
 | [API_SPEC_FULL.md](./API_SPEC_FULL.md) | **All endpoints + JSON examples** |
 | [API_SPEC.md](./API_SPEC.md) | Route index (quick lookup) |
 | [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | Tables & enums |
