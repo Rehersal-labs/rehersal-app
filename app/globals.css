@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #faf9f7;
+    --surface: #ffffff;
+    --surface-elevated: #f5f4f1;
+    --border-subtle: #e8e6e1;
+    --border-default: #d4d2cc;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5a54;
+    --text-tertiary: #8a8880;
+    --accent: #c8872a;
+    --success: #5a7a42;
+    --critical: #b84335;
+    --highlight-glow: rgba(200, 135, 42, 0.08);
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: #0a0a0b;
+    --surface: #141416;
+    --surface-elevated: #1c1c1f;
+    --border-subtle: #26262a;
+    --border-default: #33333a;
+    --text-primary: #f5f4f1;
+    --text-secondary: #a8a6a0;
+    --text-tertiary: #6e6c66;
+    --accent: #e8a33d;
+    --success: #7b9b5e;
+    --critical: #c84f3d;
+    --highlight-glow: rgba(232, 163, 61, 0.08);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground-primary font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .amber-glow {
+    box-shadow: 0 0 0 1px var(--accent), 0 0 24px var(--highlight-glow);
+  }
+}
