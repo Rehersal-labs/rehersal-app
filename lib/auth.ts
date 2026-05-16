@@ -1,12 +1,10 @@
 import { redirect } from "next/navigation";
-import type { Membership, Organization, Role, User } from "@/types";
+import type { Role } from "@/types";
 import { createServerSupabaseClient, createServiceSupabaseClient } from "./db";
 
-export interface AuthSession {
-  user: User;
-  membership: Membership;
-  organization: Organization;
-}
+export type { AuthSession } from "./auth-types";
+export { canManageTeam, isAdmin, isTeamMode } from "./auth-helpers";
+import type { AuthSession } from "./auth-types";
 
 export async function getSession(): Promise<AuthSession | null> {
   const supabase = createServerSupabaseClient();
@@ -54,18 +52,6 @@ export async function requireRole(roles: Role[]): Promise<AuthSession> {
     redirect("/dashboard");
   }
   return session;
-}
-
-export function isTeamMode(org: Organization): boolean {
-  return org.mode === "team";
-}
-
-export function canManageTeam(role: Role): boolean {
-  return role === "owner" || role === "coach";
-}
-
-export function isAdmin(role: Role): boolean {
-  return role === "owner";
 }
 
 /** Create user profile + org on first sign-in (called from callback) */

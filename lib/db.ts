@@ -1,4 +1,3 @@
-import { createBrowserClient } from "@supabase/ssr";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
@@ -14,11 +13,6 @@ function getSupabaseAnonKey(): string {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!key) throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY");
   return key;
-}
-
-/** Browser client for client components */
-export function createBrowserSupabaseClient() {
-  return createBrowserClient(getSupabaseUrl(), getSupabaseAnonKey());
 }
 
 /** Server client for Server Components and Route Handlers (respects RLS) */
