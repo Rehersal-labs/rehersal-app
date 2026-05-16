@@ -5,9 +5,19 @@
 import { readdir, readFile } from "fs/promises";
 import path from "path";
 import { LibraryProfileSchema } from "../lib/schemas";
+import { isLibraryDbReady } from "../lib/libraryDbReady";
 import { createAdminClient } from "../lib/supabaseAdmin";
 
 async function main() {
+  if (!(await isLibraryDbReady())) {
+    console.error(
+      "Library DB schema incomplete. Run migration 007 in Supabase SQL Editor,\n" +
+        "or: add DATABASE_URL to .env.local and run npm run db:repair:007\n" +
+        "Until then, GET /api/library serves profiles from public/library/*.json"
+    );
+    process.exit(1);
+  }
+
   const supabase = createAdminClient();
   const libraryDir = path.join(process.cwd(), "public", "library");
   const files = (await readdir(libraryDir)).filter((f) => f.endsWith(".json"));

@@ -24,7 +24,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
     return jsonError("Forbidden", 403);
   }
 
-  const [{ data: scenario }, { data: target }, { data: turns }] =
+  const [{ data: scenario }, { data: target }, { data: turns }, { data: report }] =
     await Promise.all([
       supabase.from("scenarios").select("*").eq("id", session.scenario_id).single(),
       supabase
@@ -37,6 +37,13 @@ export async function GET(_request: Request, { params }: RouteContext) {
         .select("*")
         .eq("session_id", params.id)
         .order("sequence", { ascending: true }),
+      session.status === "report_ready"
+        ? supabase
+            .from("feedback_reports")
+            .select("id")
+            .eq("session_id", params.id)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
     ]);
 
   const { system_prompt_used, ...safeSession } = session;
@@ -46,5 +53,6 @@ export async function GET(_request: Request, { params }: RouteContext) {
     scenario,
     target,
     turns: turns ?? [],
+    report_id: report?.id ?? null,
   });
 }

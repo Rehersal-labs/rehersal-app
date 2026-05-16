@@ -14,7 +14,8 @@
     "inspect:library": "tsx --env-file=.env.local scripts/inspect-library-table.ts",
     "storage:setup": "tsx --env-file=.env.local scripts/ensure-storage-buckets.ts",
     "db:sql": "tsx --env-file=.env.local scripts/run-sql-file.ts",
-    "db:repair:007": "tsx --env-file=.env.local scripts/run-sql-file.ts supabase/migrations/007_fix_public_figure_library.sql"
+    "db:repair:007": "tsx --env-file=.env.local scripts/run-sql-file.ts supabase/migrations/007_fix_public_figure_library.sql",
+    "smoke:health": "tsx --env-file=.env.local scripts/smoke-health.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
