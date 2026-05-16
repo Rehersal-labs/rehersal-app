@@ -142,7 +142,10 @@ export async function POST(request: Request) {
     const call = await createCall({
       userName: auth.session.user.name ?? auth.session.user.email,
       systemPromptOverride: systemPrompt,
-      tags: ["rehearsal", session.id],
+      tags: {
+        source: "rehearsal",
+        session_id: session.id,
+      },
     });
 
     const { data: readySession, error: updateError } = await supabase

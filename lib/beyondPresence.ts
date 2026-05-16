@@ -1,6 +1,7 @@
 import type { BeyCall, BeyMessage } from "@/types";
 
 const BP_BASE_URL = "https://api.bey.dev/v1";
+const BEY_CHAT_BASE = "https://bey.chat";
 
 function getApiKey(): string {
   const key = process.env.BEY_API_KEY;
@@ -32,40 +33,47 @@ async function bpFetch<T>(
     throw new Error(`Beyond Presence API error ${res.status}: ${body}`);
   }
 
-  return res.json() as Promise<T>;
+  const text = await res.text();
+  if (!text) return {} as T;
+  return JSON.parse(text) as T;
 }
 
 export interface CreateCallParams {
   agentId?: string;
   userName: string;
-  systemPromptOverride: string;
-  tags?: string[];
+  /** Applied via PATCH /agents/{id} before the call (JIT context). */
+  systemPromptOverride?: string;
+  /** Key-value tags (max 10), e.g. { session_id: "uuid", source: "rehearsal" }. */
+  tags?: Record<string, string>;
 }
 
 export async function createCall(params: CreateCallParams): Promise<BeyCall> {
   const agentId = params.agentId ?? getAgentId();
+
+  if (params.systemPromptOverride) {
+    await updateAgent(agentId, params.systemPromptOverride);
+  }
+
   const data = await bpFetch<{
     id: string;
-    join_url: string;
-    livekit_url?: string;
-    livekit_token?: string;
     agent_id: string;
+    livekit_url: string;
+    livekit_token: string;
   }>("/calls", {
     method: "POST",
     body: JSON.stringify({
       agent_id: agentId,
-      user_name: params.userName,
-      system_prompt_override: params.systemPromptOverride,
-      tags: params.tags ?? [],
+      livekit_username: params.userName,
+      tags: params.tags ?? { source: "rehearsal" },
     }),
   });
 
   return {
     id: data.id,
-    join_url: data.join_url,
+    agent_id: data.agent_id ?? agentId,
+    join_url: `${BEY_CHAT_BASE}/${agentId}`,
     livekit_url: data.livekit_url,
     livekit_token: data.livekit_token,
-    agent_id: data.agent_id,
   };
 }
 
@@ -77,7 +85,9 @@ export async function getCallMessages(callId: string): Promise<BeyMessage[]> {
 }
 
 export async function endCall(callId: string): Promise<void> {
-  await bpFetch(`/calls/${callId}/end`, { method: "POST" });
+  await bpFetch<Record<string, never>>(`/calls/${callId}/end`, {
+    method: "POST",
+  });
 }
 
 export async function updateAgent(

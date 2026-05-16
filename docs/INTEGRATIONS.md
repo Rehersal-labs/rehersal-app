@@ -17,15 +17,18 @@ POST https://api.bey.dev/v1/calls
 Content-Type: application/json
 ```
 
-**Request body (typical):**
+**Request body:**
 ```json
 {
   "agent_id": "your-agent-id",
   "livekit_username": "user-display-name",
-  "tags": ["rehearsal", "session-uuid"],
-  "system_prompt_override": "Full composed prompt from avatarBriefBuilder"
+  "tags": { "source": "rehearsal", "session_id": "uuid" }
 }
 ```
+
+**System prompt:** PATCH `/v1/agents/{agent_id}` with `system_prompt` before `POST /v1/calls` (see `lib/beyondPresence.ts` `createCall`).
+
+**Iframe URL for UI:** `https://bey.chat/{agent_id}` (returned as `join_url` in our API).
 
 **Response (map to `BeyCall` type):**
 ```json
@@ -101,7 +104,9 @@ URL input
 ### jina.ts
 
 - `GET https://r.jina.ai/` + encodeURIComponent(url)  
-- Return markdown/text
+- Return markdown/text  
+- **Env (optional):** `JINA_API_KEY` — `Authorization: Bearer …` for higher rate limits ([get key](https://jina.ai/?sui=apikey))  
+- **Without a key:** public free tier (~20 req/min); fine for local dev
 
 ### youtube.ts
 
