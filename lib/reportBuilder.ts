@@ -1,6 +1,6 @@
 import { createServiceSupabaseClient } from "@/lib/db";
 import { completionJSON } from "@/lib/openai";
-import { reportBuilderPrompt, PROMPT_VERSION } from "@/lib/prompts";
+import { buildReportBuilderPrompt, PROMPT_VERSION } from "@/lib/prompts";
 import { EvaluationSchema, FeedbackReportSchema } from "@/lib/schemas";
 import type { z } from "zod";
 import type { ConversationType, FeedbackReportJSON } from "@/types";
@@ -29,7 +29,11 @@ export async function buildFeedbackReport(
   const target = session.target_profiles as { name: string };
 
   const reportPayload = await completionJSON(
-    reportBuilderPrompt(JSON.stringify(evaluation), userContext),
+    buildReportBuilderPrompt(JSON.stringify(evaluation), userContext, {
+      targetName: target.name,
+      conversationType: scenario.conversation_type,
+      sessionDate: session.ended_at ?? session.created_at,
+    }),
     FeedbackReportSchema
   );
 

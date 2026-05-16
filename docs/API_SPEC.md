@@ -77,8 +77,15 @@ All routes: `app/api/`. Validate with `lib/schemas.ts`. Auth via `lib/auth.ts`.
 |--------|------|
 | GET | `/api/admin/sessions` |
 | GET | `/api/admin/team-report` |
+| GET | `/api/team/members` |
 | GET, POST | `/api/assignments` |
 | POST | `/api/coach-comments` |
+
+## Settings
+
+| Method | Path |
+|--------|------|
+| GET | `/api/settings/export` — owner only, JSON download |
 
 ## Webhooks
 

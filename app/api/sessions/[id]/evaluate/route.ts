@@ -1,4 +1,5 @@
 import { requireAuth } from "@/lib/api/auth";
+import { requireOpenAIConfigured } from "@/lib/api/openaiGate";
 import { jsonError, jsonOk } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
 import { evaluateSession } from "@/lib/evaluator";
@@ -9,6 +10,9 @@ type RouteContext = { params: { id: string } };
 export async function POST(_request: Request, { params }: RouteContext) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const openaiBlock = requireOpenAIConfigured();
+  if (openaiBlock) return openaiBlock;
 
   const limit = checkRateLimit(`evaluate:${auth.session.user.id}`, {
     maxRequests: 5,

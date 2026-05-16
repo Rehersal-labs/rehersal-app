@@ -1,7 +1,7 @@
 import { createServiceSupabaseClient } from "@/lib/db";
 import { completionJSON } from "@/lib/openai";
 import { retrieveContext } from "@/lib/contextRetriever";
-import { evaluatorPrompt, PROMPT_VERSION } from "@/lib/prompts";
+import { buildEvaluatorPrompt, PROMPT_VERSION } from "@/lib/prompts";
 import { buildFeedbackReport } from "@/lib/reportBuilder";
 import { EvaluationSchema } from "@/lib/schemas";
 import { formatTranscript, syncSessionTurns } from "@/lib/sessionTurns";
@@ -85,12 +85,13 @@ export async function evaluateSession(sessionId: string): Promise<void> {
     const transcript = formatTranscript(turnsAfter ?? []);
 
     const evaluation = await completionJSON(
-      evaluatorPrompt({
+      buildEvaluatorPrompt({
         transcript,
         personality,
         conversationType: (scenario as Scenario).conversation_type,
         goal: (scenario as Scenario).goal,
         userContext,
+        targetName: (target as TargetProfile).name,
       }),
       EvaluationSchema
     );

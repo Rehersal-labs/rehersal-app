@@ -68,20 +68,38 @@ All routes from [API_SPEC_FULL.md](./API_SPEC_FULL.md):
 | `npm run seed:demo` | Demo org + sample data |
 | `npm run test:bp` | Beyond Presence spike |
 | `npm run smoke:health` | GET /api/health |
+| `npm run backend:ready` | Setup + verify + seed + BP (no OpenAI) |
 | `npm run storage:setup` | Ensure buckets (script) |
+
+### New APIs (no OpenAI)
+
+| Route | Purpose |
+|-------|---------|
+| `POST /api/documents/upload` | Multipart file upload + extract text |
+| `GET /api/team/members` | List org members (coach/owner) |
+| `GET /api/settings/export` | Export workspace JSON (owner) |
+| `GET /api/health` | Extended status incl. `openai_configured` |
+
+AI routes return **503** `OPENAI_NOT_CONFIGURED` until key is set.
 
 ---
 
 ## Remaining (backend)
 
-### P0 — You must do (env + Supabase)
+### P0 — Without OpenAI (do now)
 
 | # | Task | How |
 |---|------|-----|
-| 1 | Add `OPENAI_API_KEY` | `.env.local` — blocks reconstruction, embed, evaluate |
-| 2 | Run pending SQL | Supabase SQL Editor → `supabase/RUN_PENDING.sql` or migrations 006–008 |
-| 3 | Verify DB | `npm run verify:supabase` |
-| 4 | Seed library | `npm run seed:library` |
+| 1 | Run pending SQL | Supabase SQL Editor → `supabase/RUN_PENDING.sql` |
+| 2 | Backend readiness | `npm run backend:ready` |
+| 3 | Verify health | `GET /api/health` shows `openai_configured: false` until key added |
+
+### P0 — After OpenAI key added
+
+| # | Task | How |
+|---|------|-----|
+| 4 | Add `OPENAI_API_KEY` | `.env.local` — enables reconstruct, embed, evaluate |
+| 5 | Test AI pipelines | reconstruct → session → evaluate |
 
 ### P1 — Verify pipelines (manual / scripts)
 

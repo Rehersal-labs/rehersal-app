@@ -1,8 +1,8 @@
 import { createServiceSupabaseClient } from "@/lib/db";
 import { completion, completionJSON } from "@/lib/openai";
 import {
-  avatarBriefTemplatePrompt,
-  reconstructionPrompt,
+  buildAvatarBriefPrompt,
+  buildReconstructionPrompt,
 } from "@/lib/prompts";
 import { PersonalityJSONSchema } from "@/lib/schemas";
 import { scrapeUrl } from "@/lib/scraper";
@@ -46,21 +46,19 @@ export async function reconstructTarget(targetId: string): Promise<void> {
         source.url ??
         source.manual_text?.slice(0, 40) ??
         "Source";
-      labeledChunks.push(`### ${label}\n${text}`);
+      labeledChunks.push(`=== SOURCE: ${label} ===\n${text}`);
     }
 
     if (labeledChunks.length === 0) {
       throw new Error("No usable source content for reconstruction");
     }
 
-    const sourceText = labeledChunks.join("\n\n");
+    const labeledSources = labeledChunks.join("\n\n");
     const personality = await completionJSON(
-      reconstructionPrompt(sourceText),
+      buildReconstructionPrompt(labeledSources),
       PersonalityJSONSchema
     );
-    const avatarBrief = await completion(
-      avatarBriefTemplatePrompt(personality)
-    );
+    const avatarBrief = await completion(buildAvatarBriefPrompt(personality));
 
     const { error: updateError } = await supabase
       .from("target_profiles")

@@ -1,5 +1,5 @@
 import { createServiceSupabaseClient } from "@/lib/db";
-import { embed } from "@/lib/openai";
+import { embed, isOpenAIConfigured } from "@/lib/openai";
 
 export interface RetrievedChunk {
   chunk_text: string;
@@ -13,6 +13,10 @@ export async function retrieveContext(params: {
   includeCompany: boolean;
   limit?: number;
 }): Promise<string> {
+  if (!isOpenAIConfigured()) {
+    return "No uploaded context documents matched this scenario. (Embeddings require OPENAI_API_KEY.)";
+  }
+
   const supabase = createServiceSupabaseClient();
   const queryEmbedding = await embed(params.goal);
 

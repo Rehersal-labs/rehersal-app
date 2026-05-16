@@ -1,4 +1,4 @@
-import { avatarSystemPrompt } from "@/lib/prompts";
+import { buildAvatarSystemPrompt as composeAvatarSystemPrompt } from "@/lib/prompts";
 import type {
   ConversationType,
   PersonalityJSON,
@@ -22,7 +22,7 @@ export function buildAvatarSystemPrompt(input: AvatarBriefInput): string {
     ? `${personaBlock}\n\nPERSONALITY PROFILE:\n${JSON.stringify(personality, null, 2)}`
     : personaBlock;
 
-  return avatarSystemPrompt({
+  return composeAvatarSystemPrompt({
     personaBlock: personaWithProfile,
     userContextBlock: input.userContextBlock,
     conversationType: input.scenario.conversation_type as ConversationType,

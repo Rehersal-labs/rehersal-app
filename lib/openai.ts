@@ -5,9 +5,16 @@ import { validateAISafety } from "./schemas";
 const MODEL = "gpt-4o";
 const EMBEDDING_MODEL = "text-embedding-3-small";
 
+/** True when OPENAI_API_KEY is set — use before AI routes/pipelines. */
+export function isOpenAIConfigured(): boolean {
+  return Boolean(process.env.OPENAI_API_KEY?.trim());
+}
+
 function getClient(): OpenAI {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  if (!apiKey) {
+    throw new Error("OPENAI_NOT_CONFIGURED");
+  }
   return new OpenAI({ apiKey });
 }
 

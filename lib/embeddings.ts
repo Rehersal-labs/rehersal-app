@@ -1,5 +1,5 @@
 import { createServiceSupabaseClient } from "@/lib/db";
-import { embedBatch } from "@/lib/openai";
+import { embedBatch, isOpenAIConfigured } from "@/lib/openai";
 import { parseFile } from "@/lib/fileParser";
 import type { FileType } from "@/types";
 
@@ -49,6 +49,14 @@ export async function embedDocument(documentId: string): Promise<void> {
     .single();
 
   if (error || !doc) throw new Error("Document not found");
+
+  if (!isOpenAIConfigured()) {
+    await supabase
+      .from("user_documents")
+      .update({ embedding_status: "failed" })
+      .eq("id", documentId);
+    throw new Error("OPENAI_NOT_CONFIGURED");
+  }
 
   await supabase
     .from("user_documents")

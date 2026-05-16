@@ -1,4 +1,5 @@
 import { requireAuth } from "@/lib/api/auth";
+import { requireOpenAIConfigured } from "@/lib/api/openaiGate";
 import { jsonError, jsonOk, parseJsonBody } from "@/lib/api/http";
 import { documentBelongsToOrg } from "@/lib/api/org";
 import { embedDocument, embedPendingDocuments } from "@/lib/embeddings";
@@ -8,6 +9,9 @@ import { checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 export async function POST(request: Request) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const openaiBlock = requireOpenAIConfigured();
+  if (openaiBlock) return openaiBlock;
 
   const limit = checkRateLimit(`embed:${auth.session.user.id}`, {
     maxRequests: 10,
