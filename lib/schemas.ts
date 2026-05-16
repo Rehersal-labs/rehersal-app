@@ -207,6 +207,10 @@ export const AddSourceSchema = TargetSourceSchema.refine(
 
 // ─── Documents ──────────────────────────────────────────────────────────────
 
+export const EmbedDocumentSchema = z.object({
+  document_id: z.string().uuid().optional(),
+});
+
 export const CreateDocumentSchema = z.object({
   filename: z.string().min(1),
   file_url: z.string().url(),
