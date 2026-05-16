@@ -7,7 +7,7 @@ import {
 import { PersonalityJSONSchema } from "@/lib/schemas";
 import { scrapeUrl } from "@/lib/scraper";
 import { parseFile } from "@/lib/fileParser";
-import type { TargetSource } from "@/types";
+import type { PersonalityJSON, TargetSource } from "@/types";
 
 export async function reconstructTarget(targetId: string): Promise<void> {
   const supabase = createServiceSupabaseClient();
@@ -65,10 +65,10 @@ export async function reconstructTarget(targetId: string): Promise<void> {
     }
 
     const labeledSources = labeledChunks.join("\n\n");
-    const personality = await completionJSON(
+    const personality = (await completionJSON(
       buildReconstructionPrompt(labeledSources),
       PersonalityJSONSchema
-    );
+    )) as PersonalityJSON;
     const avatarBrief = await completion(buildAvatarBriefPrompt(personality));
 
     const { error: updateError } = await supabase

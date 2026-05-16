@@ -1,11 +1,7 @@
 import OpenAI from "openai";
 import { GoogleGenerativeAI, TaskType } from "@google/generative-ai";
 import type { ZodSchema } from "zod";
-import {
-  coercePersonalityJson,
-  PersonalityJSONSchema,
-  validateAISafety,
-} from "./schemas";
+import { coercePersonalityJson, validateAISafety } from "./schemas";
 
 export type LLMProvider = "gemini" | "openai";
 
@@ -177,8 +173,12 @@ export async function completionJSON<T>(
   }
 
   const toParse =
-    schema === PersonalityJSONSchema ? coercePersonalityJson(parsed) : parsed;
-  return schema.parse(toParse);
+    parsed &&
+    typeof parsed === "object" &&
+    "communication_style" in (parsed as object)
+      ? coercePersonalityJson(parsed)
+      : parsed;
+  return schema.parse(toParse) as T;
 }
 
 async function geminiEmbed(text: string): Promise<number[]> {

@@ -85,7 +85,7 @@ export const LibraryCategorySchema = z.enum([
 const nullableStr = (fallback: string) =>
   z
     .union([z.string(), z.null(), z.undefined()])
-    .transform((v) => (v?.trim() ? v : fallback));
+    .transform((v) => (typeof v === "string" && v.trim() ? v : fallback));
 
 export const CommunicationStyleSchema = z.object({
   directness: nullableStr("direct"),
