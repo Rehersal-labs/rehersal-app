@@ -10,7 +10,8 @@
     "seed:library": "tsx --env-file=.env.local scripts/seed-library.ts",
     "seed:demo": "tsx --env-file=.env.local scripts/seed-demo.ts",
     "embed:docs": "tsx --env-file=.env.local scripts/embed-existing-docs.ts",
-    "verify:supabase": "tsx --env-file=.env.local scripts/verify-supabase.ts"
+    "verify:supabase": "tsx --env-file=.env.local scripts/verify-supabase.ts",
+    "inspect:library": "tsx --env-file=.env.local scripts/inspect-library-table.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

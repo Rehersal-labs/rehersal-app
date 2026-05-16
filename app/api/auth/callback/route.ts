@@ -5,7 +5,7 @@ import { provisionNewUser } from "@/lib/auth";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const nextParam = searchParams.get("next");
 
   if (!code) {
     return NextResponse.redirect(`${origin}/signin?error=auth`);
@@ -24,7 +24,9 @@ export async function GET(request: Request) {
     .eq("id", data.user.id)
     .maybeSingle();
 
+  let isNewUser = false;
   if (!existingUser) {
+    isNewUser = true;
     await provisionNewUser({
       userId: data.user.id,
       email: data.user.email ?? "",
@@ -32,6 +34,9 @@ export async function GET(request: Request) {
       avatarUrl: data.user.user_metadata?.avatar_url,
     });
   }
+
+  const next =
+    nextParam ?? (isNewUser ? "/onboarding" : "/dashboard");
 
   return NextResponse.redirect(`${origin}${next}`);
 }
