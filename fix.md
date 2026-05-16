@@ -1,9 +1,9 @@
-# Rehearsal — Project Audit & Fix Tracker (v2, post-merge)
+# Rehearsal — Project Audit & Fix Tracker (v3, post-frontend-integration)
 
 **Audited against:** Full Rehearsal spec (Parts 1–17)  
 **Date:** 2026-05-16  
-**Branch:** `main`  
-**Git status:** Frontend integrated — see `docs/STATUS.md` for live checklist
+**Branch:** `main` — clean, all committed  
+**Last commit:** "Integrate full frontend: pages, components, auth, and library profiles"
 
 ---
 
@@ -12,415 +12,307 @@
 | Phase | Description | Status |
 |-------|-------------|--------|
 | A — Foundation | Next.js, Supabase, migrations, types, schemas, lib modules | ✅ Complete |
-| B — Auth + Onboarding | Sign-in, callback, onboarding flow, app shell | ✅ Complete — enable Google in Supabase for production |
-| C — Target Builder | Builder steps, scraper, reconstruction, API routes | ✅ UI + API — verify E2E with OpenAI |
-| D — Documents + Context Engine | Upload, embedding, retrieval, API routes | ✅ UI + API — verify embed pipeline |
-| E — Scenarios + Avatar Brief | Configurator, prompts, API routes | ✅ UI + API |
-| F — Live Session | BP integration, session UI, end flow | ✅ UI + API — verify live BP call |
-| G — Evaluation + Report | Evaluator, report builder, report UI | ✅ UI + API — verify post-session eval |
-| H — Progress + History | Progress dashboard, charts, history | ✅ UI — verify with session data |
-| I — Public Figure Library | Library browser, 15 JSON profiles | ✅ 15 JSON + UI — run `npm run seed:library` |
-| J — Team Features | Coach dashboard, admin, assignments | ✅ UI + API |
-| K — Settings | Solo + team settings pages | ✅ UI + API |
-| L — Polish | Skeletons, errors, mobile, rate limiting | ❌ Not started |
-| M — Safety + Final QA | Safety audit, E2E testing, demo workspace | ❌ Not started |
+| B — Auth + Onboarding | Sign-in (Google + magic link), callback, onboarding, app shell | ✅ Complete |
+| C — Target Builder | Builder steps, scraper, reconstruction, API routes, UI | ✅ Complete — verify E2E with real OpenAI key |
+| D — Documents + Context Engine | Upload, embedding, retrieval, API routes, UI | ✅ Complete — verify embed pipeline |
+| E — Scenarios + Avatar Brief | Configurator, 10 prompt templates, API routes, UI | ✅ Complete |
+| F — Live Session | BP integration, session UI, end flow | ✅ Complete — verify live BP call |
+| G — Evaluation + Report | Evaluator, report builder, full report UI | ✅ Complete — verify post-session eval |
+| H — Progress + History | Progress dashboard, Recharts, session history | ✅ Complete — verify with real session data |
+| I — Public Figure Library | 15 JSON profiles, library browser UI | ✅ Complete — run `npm run seed:library` |
+| J — Team Features | Coach dashboard, admin view, assignments | ✅ Complete |
+| K — Settings | Solo + team settings pages | ✅ Complete |
+| L — Polish | Loading skeletons, error states, mobile, rate limiting | ❌ Not started |
+| M — Safety + Final QA | Safety audit, E2E tests, demo workspace, RLS verify | ❌ Not started |
 
 ---
 
-## CRITICAL Issues — Blocking Users from Using the App
+## RESOLVED — No Longer Issues
 
-### C1. Frontend Pages — 17 of 18 Missing
-
-**Present (3 total):**
-- `app/(auth)/signin/page.tsx` ✅
-- `app/(auth)/onboarding/page.tsx` ✅ *(resolved since v1)*
-- `app/(app)/dashboard/page.tsx` ✅ *(placeholder only)*
-
-**Missing — 17 pages to create:**
-
+### ~~C1. Frontend Pages~~ ✅ RESOLVED
+All 18 pages now exist with real implementations:
 ```
-app/(app)/targets/page.tsx
-app/(app)/targets/new/page.tsx
-app/(app)/targets/[id]/page.tsx
-app/(app)/targets/[id]/edit/page.tsx
-app/(app)/documents/page.tsx
-app/(app)/company-documents/page.tsx
-app/(app)/scenarios/page.tsx
-app/(app)/scenarios/new/page.tsx
-app/(app)/scenarios/[id]/page.tsx
-app/(app)/sessions/[id]/page.tsx
-app/(app)/reports/[id]/page.tsx
-app/(app)/library/page.tsx
-app/(app)/library/[id]/page.tsx
-app/(app)/progress/page.tsx
-app/(app)/assignments/page.tsx
-app/(app)/admin/page.tsx
-app/(app)/settings/page.tsx
+app/(auth)/signin/page.tsx          ✅
+app/(auth)/onboarding/page.tsx      ✅
+app/(app)/dashboard/page.tsx        ✅
+app/(app)/targets/page.tsx          ✅
+app/(app)/targets/new/page.tsx      ✅
+app/(app)/targets/[id]/page.tsx     ✅
+app/(app)/targets/[id]/edit/page.tsx ✅
+app/(app)/documents/page.tsx        ✅
+app/(app)/company-documents/page.tsx ✅
+app/(app)/scenarios/page.tsx        ✅
+app/(app)/scenarios/new/page.tsx    ✅
+app/(app)/scenarios/[id]/page.tsx   ✅
+app/(app)/sessions/[id]/page.tsx    ✅
+app/(app)/reports/[id]/page.tsx     ✅
+app/(app)/library/page.tsx          ✅
+app/(app)/library/[id]/page.tsx     ✅
+app/(app)/progress/page.tsx         ✅
+app/(app)/assignments/page.tsx      ✅
+app/(app)/admin/page.tsx            ✅
+app/(app)/settings/page.tsx         ✅
 ```
 
-**Build order (dependency chain — do not skip):**
-1. Shared components first (Sidebar, AppShell, EmptyState, LoadingSkeleton)
-2. Update `app/(app)/layout.tsx` to use real Sidebar + AppShell
-3. Target pages (depend on TargetBuilder components)
-4. Documents, Scenarios pages
-5. Session page (depends on LiveSessionPanel, SessionEmbed)
-6. Report page (depends on FeedbackReport, ScoreGauge, KeyMomentCard)
-7. Progress, Library, Assignments, Admin, Settings pages
+### ~~C2. UI Components~~ ✅ RESOLVED
+All 42+ components built across all feature folders:
+- `components/shared/` — AppShell, Sidebar, OnboardingFlow, EmptyState, LoadingSkeleton, ErrorBoundary, ConfirmDialog ✅
+- `components/auth/` — SignInForm (Google OAuth + magic link) ✅
+- `components/targets/` — TargetBuilder, Steps 1–4, TargetCard, PersonalityProfileCard, SourceManager ✅
+- `components/documents/` — DocumentUploader, DocumentList, DocumentTypeSelector, CompanyDocumentsClient ✅
+- `components/scenarios/` — ScenarioConfigurator, ScenarioCard, ConversationTypePicker, DifficultySlider, AvatarBriefPreview ✅
+- `components/sessions/` — PreSessionChecklist, LiveSessionPanel, SessionEmbed, GeneratingReportState, CoachingBreakPanel ✅
+- `components/reports/` — FeedbackReport, ScoreGauge, ExecutiveSummary, KeyMomentCard, SuggestedAnswer, TranscriptViewer, CommunicationNotes, AccuracyRater, CoachCommentBox ✅
+- `components/progress/` — ProgressDashboard, ImprovementChart, SkillRadar, SessionHistoryList, StreakTracker ✅
+- `components/library/` — LibraryBrowser, LibraryCard, LibraryFilterTabs, LibraryDetailModal ✅
+- `components/admin/` — AdminPageClient, TeamMemberTable, SkillGapChart, TeamPulseBand, AssignmentManager ✅
+- `components/ui/` — 20+ shadcn/ui components ✅
+
+### ~~C3. Library JSON Profiles~~ ✅ RESOLVED
+All 15 profiles present in `public/library/`:
+```
+contrarian-seed-vc.json         ✅
+faang-bar-raiser.json           ✅
+data-driven-series-a-vc.json    ✅
+skeptical-cfo.json              ✅
+probing-podcast-host.json       ✅
+aggressive-cross-examiner.json  ✅
+demanding-board-chair.json      ✅
+empathetic-hr-partner.json      ✅
+impatient-prospect.json         ✅
+technical-deep-dive.json        ✅
+conflict-avoidant-partner.json  ✅
+direct-communicator-partner.json ✅
+defensive-partner.json          ✅
+supportive-parent.json          ✅
+traditional-parent.json         ✅
+```
+After running migrations 006+007, run: `npm run seed:library`
+
+### ~~G1, G2 — Git Issues~~ ✅ RESOLVED
+All files committed. Working tree clean.
 
 ---
 
-### C2. UI Components — 40+ of 42 Missing
+## OPEN — Must Fix Before Production
 
-**Present (2 total):**
-- `components/providers.tsx` ✅
-- `components/ui/button.tsx` ✅
+### N1. Three Duplicate Supabase Client Definitions (HIGH)
 
-**Missing by folder — create in this order:**
+Three files export functionally identical clients under different names:
 
-**`/components/shared/`** ← build first, everything depends on these
-```
-Sidebar.tsx
-AppShell.tsx
-EmptyState.tsx
-LoadingSkeleton.tsx
-ErrorBoundary.tsx
-ConfirmDialog.tsx
-OnboardingFlow.tsx
-```
+| File | Export | Status |
+|------|--------|--------|
+| `lib/db.ts` | `createServerSupabaseClient()`, `createServiceSupabaseClient()` | Spec-correct |
+| `lib/supabase/browser.ts` | `createBrowserSupabaseClient()` | Duplicate |
+| `lib/supabaseAdmin.ts` | `createAdminClient()` | Duplicate of service client |
 
-**`/components/targets/`**
-```
-TargetBuilder.tsx
-TargetBuilderStep1.tsx       (Basics: name, title, company, domain)
-TargetBuilderStep2.tsx       (Sources: URL / Document / Describe tabs)
-TargetBuilderStep3.tsx       (Reconstruction progress, 3-sec polling)
-TargetBuilderStep4.tsx       (Review profile)
-PersonalityProfileCard.tsx
-SourceManager.tsx
-TargetCard.tsx
-```
+**Risk:** Inconsistent imports across the codebase. Developers already import from different files.
 
-**`/components/documents/`**
-```
-DocumentUploader.tsx
-DocumentList.tsx
-DocumentTypeSelector.tsx
-```
-
-**`/components/scenarios/`**
-```
-ScenarioConfigurator.tsx
-ConversationTypePicker.tsx
-DifficultySlider.tsx
-AvatarBriefPreview.tsx
-ScenarioCard.tsx
-```
-
-**`/components/sessions/`**
-```
-PreSessionChecklist.tsx
-LiveSessionPanel.tsx
-SessionEmbed.tsx
-GeneratingReportState.tsx
-```
-
-**`/components/reports/`**
-```
-FeedbackReport.tsx
-ScoreGauge.tsx
-ExecutiveSummary.tsx
-KeyMomentCard.tsx
-SuggestedAnswer.tsx
-TranscriptViewer.tsx
-CommunicationNotes.tsx
-AccuracyRater.tsx
-CoachCommentBox.tsx
-```
-
-**`/components/progress/`**
-```
-ProgressDashboard.tsx
-ImprovementChart.tsx
-SkillRadar.tsx
-SessionHistoryList.tsx
-StreakTracker.tsx
-```
-
-**`/components/library/`**
-```
-LibraryBrowser.tsx
-LibraryCard.tsx
-LibraryFilterTabs.tsx
-LibraryDetailModal.tsx
-```
-
-**`/components/admin/`**
-```
-TeamPulseBand.tsx
-TeamMemberTable.tsx
-SkillGapChart.tsx
-AssignmentManager.tsx
-```
-
-**shadcn/ui components still needed** (install via `npx shadcn@latest add <name>`):
-```
-input  textarea  select  checkbox  slider  badge  card  dialog  sheet
-tabs  separator  avatar  skeleton  progress  toast  tooltip
-dropdown-menu  command  popover  calendar
-```
+**Fix:**
+1. Add `createBrowserSupabaseClient()` export to `lib/db.ts`
+2. Delete `lib/supabase/browser.ts` and `lib/supabaseAdmin.ts`
+3. Find-replace all import sites to use `lib/db.ts`
 
 ---
 
-### C3. Library JSON Profiles — 14 of 15 Missing
-
-**Present:** `public/library/contrarian-seed-vc.json` ✅
-
-**Missing (create all 14, then run `npm run seed:library`):**
-```
-public/library/faang-bar-raiser.json
-public/library/data-driven-series-a-vc.json
-public/library/skeptical-cfo.json
-public/library/probing-podcast-host.json
-public/library/aggressive-cross-examiner.json
-public/library/demanding-board-chair.json
-public/library/empathetic-hr-partner.json
-public/library/impatient-prospect.json
-public/library/technical-deep-dive.json
-public/library/conflict-avoidant-partner.json
-public/library/direct-communicator-partner.json
-public/library/defensive-partner.json
-public/library/supportive-parent.json
-public/library/traditional-parent.json
-```
-
-Each file must validate against `LibraryProfileSchema` in [lib/schemas.ts](lib/schemas.ts). Use `public/library/contrarian-seed-vc.json` as the template. Note: `scripts/generate-library-json.py` (Python) exists and may have been used to generate profiles — check its output before creating files from scratch.
-
----
-
-## HIGH Priority — Fix Before Building Frontend
-
-### N1. Three Duplicate Supabase Client Definitions
-
-Three separate files create the same clients with slightly different function names:
-
-| File | Exports | Equivalent to |
-|------|---------|---------------|
-| `lib/db.ts` | `createServerSupabaseClient()`, `createServiceSupabaseClient()` | (spec-correct location) |
-| `lib/supabase/browser.ts` | `createBrowserSupabaseClient()` | duplicates db.ts pattern |
-| `lib/supabaseAdmin.ts` | `createAdminClient()` | same as `createServiceSupabaseClient()` |
-
-**Risk:** If a developer imports from `lib/supabaseAdmin.ts` in one file and `lib/db.ts` in another, they use different client instances. With the service role key, this is silent — no error, just inconsistency. Already happening: `app/api/documents/upload/route.ts` imports from `lib/db.ts` while other routes may import from `lib/supabaseAdmin.ts`.
-
-**Fix:** Add `createBrowserSupabaseClient()` export to `lib/db.ts`, then delete:
-- `lib/supabase/browser.ts`
-- `lib/supabaseAdmin.ts`
-
-Update all import sites to use `lib/db.ts` exclusively.
-
----
-
-### N2. Auth Logic Split Across Three Files
+### N2. Auth Logic Fragmented Across Three Files (MEDIUM)
 
 | File | Content |
 |------|---------|
-| `lib/auth.ts` | Main session helpers, requireSession, requireAuth |
-| `lib/auth-helpers.ts` | Additional helpers (may overlap with auth.ts) |
-| `lib/auth-types.ts` | Only 8 lines — just the `AuthSession` interface |
+| `lib/auth.ts` | Main helpers — getSession, requireSession, provisionNewUser |
+| `lib/auth-helpers.ts` | Additional helpers — canManageTeam, isTeamMode, etc. |
+| `lib/auth-types.ts` | 8 lines — only the `AuthSession` interface |
 
-**Spec specifies only `lib/auth.ts`.**
+Spec specifies only `lib/auth.ts`. The split creates unclear import paths.
 
 **Fix:**
-1. Move `AuthSession` interface from `lib/auth-types.ts` → `types/index.ts`
+1. Move `AuthSession` from `lib/auth-types.ts` → `types/index.ts`
 2. Merge `lib/auth-helpers.ts` content into `lib/auth.ts`
 3. Delete `lib/auth-types.ts` and `lib/auth-helpers.ts`
 4. Update all import sites
 
 ---
 
-### N3. Document Upload Route Deviates from Spec API Surface
+### N3. Document Upload Route Deviates from Spec (MEDIUM)
 
-**Spec:** `POST /api/documents` — uploads a file (multipart), returns document  
-**Reality:** `POST /api/documents/upload` — the actual upload handler (139 lines, well-implemented)  
-**`app/api/documents/route.ts`** — now likely handles only GET (list)
+| Route | Spec | Reality |
+|-------|------|---------|
+| `POST /api/documents` | Upload file (multipart) | Lists documents (GET only) |
+| `POST /api/documents/upload` | Does not exist in spec | Actual upload handler |
 
-**Risk:** Frontend built to spec will call `POST /api/documents` and get back a list or 405 error instead of uploading. This is a silent contract break.
+**Risk:** Any frontend code built to spec calling `POST /api/documents` gets a list back, not an upload. The `DocumentUploader.tsx` component must be verified to call `/api/documents/upload`.
 
-**Decision required (pick one before building frontend):**
-- **Option A (spec-compliant):** Move multipart handler from `app/api/documents/upload/route.ts` into `app/api/documents/route.ts` POST handler. Delete the `/upload` sub-route.
-- **Option B (keep deviation):** Keep `/api/documents/upload` as-is, but update `docs/API_SPEC.md` and all frontend components to use this URL. Add a redirect or 308 from `POST /api/documents` → `/api/documents/upload`.
-
----
-
-## MEDIUM Priority — Structural Cleanup
-
-### S1. `organizations.plan` Column Implies Billing (Excluded from MVP)
-
-**File:** `supabase/migrations/005_audit_logs_and_columns.sql`
-
-The `organizations.plan` column (default `'free'`) implies subscription tiers. Part 15 of the spec explicitly excludes billing/plans from MVP.
-
-**Fix:** Either remove the column from migration 005, or add a `-- reserved for post-MVP` comment and ensure no code reads it. Do not wire it to any UI or pricing logic.
+**Fix (pick one):**
+- **Option A — spec-compliant:** Merge the upload handler into `app/api/documents/route.ts` POST, delete the `/upload` sub-route
+- **Option B — keep deviation:** Verify `DocumentUploader.tsx` calls `/api/documents/upload`, update `docs/API_SPEC.md` to document the deviation
 
 ---
 
-### S4. Python Scripts Not Executable in Node/npm Environment
+### N4. Python Scripts in TypeScript Project (LOW)
 
-| File | Type | Status |
-|------|------|--------|
-| `scripts/generate-library-json.py` | Python | Not runnable via npm; may have generated library JSON |
-| `scripts/fix-motion.py` | Python | Purpose unclear |
-| `scripts/fix-motion.js` | JavaScript (not TypeScript) | Inconsistent with project |
+| File | Issue |
+|------|-------|
+| `scripts/generate-library-json.py` | Python — not runnable via npm |
+| `scripts/fix-motion.py` | Python — purpose unclear |
+| `scripts/fix-motion.js` | JavaScript, not TypeScript |
 
-**Fix:** If `generate-library-json.py` was used to produce the library profiles, run it now (Python 3 required) and commit all 14 missing JSON files. Then delete the Python scripts. `fix-motion.js`/`.py` — determine if still needed; delete if not.
-
----
-
-### S5. Code-Generation Scripts Not in Spec
-
-- `scripts/generate-frontend.mjs` — programmatic frontend generator  
-- `scripts/scaffold-ui.mjs` — UI scaffolding script  
-
-These may have been intended to bootstrap component files. If they were run and produced output, check what was generated and whether it matches the spec. If not yet run, evaluate whether to use them or build manually.
-
-**Fix:** Run `node scripts/scaffold-ui.mjs` and inspect output. Accept output that matches spec, reject/rewrite what does not. Delete scripts after use.
+**Fix:** If library JSON was generated by the Python script, it's already done — delete all three files. Otherwise convert to TypeScript.
 
 ---
 
-### S6. Duplicate Auth Callback Route
+### S1. `organizations.plan` Column Implies Billing (LOW)
 
-**Spec-correct:** `app/(auth)/callback/route.ts` (accessible at `/callback`) ✅  
-**Extra:** `app/api/auth/callback/route.ts` (accessible at `/api/auth/callback`) ❌
+`supabase/migrations/005_audit_logs_and_columns.sql` adds `organizations.plan DEFAULT 'free'`. Part 15 of the spec explicitly excludes billing/plans from MVP.
 
-Only one URL can be registered in Supabase Auth → Redirect URLs settings.
-
-**Fix:** Check your Supabase dashboard → Authentication → URL Configuration → Redirect URLs. Whichever URL is registered is the active one. Delete the other route file.
+**Fix:** Add a comment in the migration marking it as reserved for post-MVP, and ensure no UI code reads this column.
 
 ---
 
-### S7. `AGENTS.md` Exists at Both Root and `/docs/`
+### S6. Duplicate Auth Callback Routes (LOW)
 
-- `AGENTS.md` (root) — not in spec  
-- `docs/AGENTS.md` — also exists (correct location per docs convention)
+| Route | Path | Status |
+|-------|------|--------|
+| `app/(auth)/callback/route.ts` | `/callback` | Spec-correct |
+| `app/api/auth/callback/route.ts` | `/api/auth/callback` | Extra |
 
-**Fix:** Delete `AGENTS.md` from root. Content is already in `docs/AGENTS.md`.
+Only one URL can be registered in Supabase Auth → Redirect URLs. Both routes exist — only one will ever receive the redirect.
 
----
-
-## LOW Priority — Informational / Keep As-Is
-
-### INFO: Extra API Routes Added by Merge (Keep All)
-
-These routes are not in spec but are required for the app to function correctly:
-
-| Route | Why it's needed |
-|-------|----------------|
-| `app/api/me/route.ts` | Returns current user + org + membership — used by client hooks |
-| `app/api/onboarding/route.ts` | Completes 5-step onboarding, creates org + membership |
-| `app/api/settings/export/route.ts` | Data export (spec requires this in Settings, F13) |
-| `app/api/team/members/route.ts` | Team member list for admin view (spec F12 requires it) |
-
-**No action needed** — document in `docs/API_SPEC.md` if not already listed.
-
-### INFO: Extra `lib/` Utilities Added by Merge (Keep All)
-
-| File | Purpose |
-|------|---------|
-| `lib/assignments.ts` | Assignment query helpers |
-| `lib/constants.ts` | Shared constants |
-| `lib/libraryDbReady.ts` | Checks if library table has been seeded |
-| `lib/loadLibraryProfiles.ts` | JSON fallback loader for library profiles |
-| `lib/api/openaiGate.ts` | Guards endpoints when OPENAI_API_KEY is missing |
-| `lib/hooks/use-api.ts` | TanStack Query React hooks |
-| `lib/hooks/use-team-report.ts` | Team report hook |
-
-**No action needed** — all are useful, none conflict with spec.
-
-### INFO: Migration 008 Storage Buckets — Required Infrastructure
-
-`supabase/migrations/008_storage_buckets.sql` — creates `documents` and `reports` Supabase Storage buckets. The spec relies on Storage (Part 10, F2) but omits a migration for it. This is a correct addition.
-
-**No action needed.**
-
-### INFO: `supabase/RUN_PENDING.sql`
-
-Convenience file to run outstanding migrations locally. Not in spec, harmless.
+**Fix:** Check Supabase dashboard → Auth → URL Configuration. Whichever redirect URL is registered there is the active one. Delete the unused route file.
 
 ---
 
-## TYPE/SCHEMA Issues — Fix Before AI Pipelines Run
+## TYPE/SCHEMA Issues — Fix Before OpenAI Pipelines Run
 
-### T1. `PersonalityJSON.inferred_concerns_by_context` Will Fail Zod Validation
+### T1. PersonalityJSON Zod Schema Too Strict (HIGH)
 
-**Files:** `lib/schemas.ts` and `types/index.ts`
+**Files:** `lib/schemas.ts` + `types/index.ts`
 
-**Problem:** The Zod schema uses `z.record(ConversationTypeSchema, z.array(z.string()))` which requires OpenAI to return all 10 exact `ConversationType` enum keys. In practice, the model returns only a subset (e.g., 4–6 relevant types), causing `safeParse` to fail and reconstruction to break silently.
+**Problem:** `z.record(ConversationTypeSchema, z.array(z.string()))` requires all 10 ConversationType keys. OpenAI returns only a relevant subset → `safeParse` fails → reconstruction silently breaks.
 
 **Fix in `lib/schemas.ts`:**
 ```typescript
-// Current (too strict — breaks if any key is missing):
+// Change:
 inferred_concerns_by_context: z.record(ConversationTypeSchema, z.array(z.string())),
-
-// Change to (accepts any string keys from AI):
+// To:
 inferred_concerns_by_context: z.record(z.string(), z.array(z.string())),
 ```
 
 **Fix in `types/index.ts`:**
 ```typescript
-// Current:
+// Change:
 inferred_concerns_by_context: Record<ConversationType, string[]>;
-
-// Change to:
+// To:
 inferred_concerns_by_context: Partial<Record<ConversationType, string[]>>;
 ```
 
 ---
 
-### T2. Embedding Chunk Size is ~4x Too Small
+### T2. Embedding Chunk Size ~4x Too Small (MEDIUM)
 
 **File:** `lib/embeddings.ts`
 
-**Problem:** Spec says "512-token segments with 50-token overlap." The implementation chunks by characters (likely ~512 chars). Since 1 token ≈ 4 characters: 512 chars ≈ 128 tokens — only 25% of the target. This produces 4x more chunks than needed, each with too little context per chunk, degrading retrieval quality.
+**Problem:** Spec says "512-token segments." Code chunks by characters (likely ~512 chars ≈ 128 tokens). Results in 4x more chunks with too little context per chunk.
 
-**Fix in `lib/embeddings.ts`:** Find the chunk size constants and update:
+**Fix:** Find the chunk size constants in `lib/embeddings.ts` and update:
 ```typescript
-// Change FROM whatever the current values are TO:
-const CHUNK_SIZE = 2048;    // ~512 tokens
+const CHUNK_SIZE = 2048;    // ~512 tokens at 4 chars/token
 const CHUNK_OVERLAP = 200;  // ~50 tokens
 ```
 
 ---
 
-## Resolved Since v1
+## REMAINING — Phase L & M
 
-| Issue | Resolution |
-|-------|------------|
-| G1 — `lib/embeddings.ts` untracked | ✅ Committed in merge |
-| G2 — `.cursor/rules/project-rules.md` unstaged | ✅ Committed in merge |
-| C1 — `app/(auth)/onboarding/page.tsx` missing | ✅ Now exists |
+### Phase L — Polish (Not Started)
+
+All the following are missing:
+
+| Item | Where |
+|------|-------|
+| Loading skeletons on all data-fetch pages | All `app/(app)/*/page.tsx` |
+| Error boundaries with retry buttons | `components/shared/ErrorBoundary.tsx` (exists, needs wiring) |
+| Empty states with CTAs | Pages with no data |
+| Mobile responsiveness audit | All pages — test on 375px viewport |
+| AI endpoint rate limiting | `lib/rateLimit.ts` exists — verify wired on reconstruct, evaluate, embed routes |
+| Request body Zod validation on every API route | Audit all `app/api/` routes |
+| Consent + AI disclosure banner before every session | `PreSessionChecklist.tsx` — verify consent checkbox present |
 
 ---
 
-## Recommended Build Order (Frontend)
+### Phase M — Safety + Final QA (Not Started)
+
+| Item | How to verify |
+|------|--------------|
+| Evaluator forbidden-phrase audit | Search evaluator output for: "should be hired", "no hire", "is dishonest", "lacks intelligence" |
+| Avatar prompt forbidden-topic audit | Review all 10 prompts in `lib/prompts.ts` |
+| RLS two-user test | Create two Supabase users in separate orgs; confirm no cross-read |
+| No API keys in browser bundle | `npm run build` → check `.next/static/` for key strings |
+| Full E2E session loop | Sign up → build target → upload doc → configure scenario → live session → report |
+| Seed demo workspace | `npm run seed:demo` |
+| Library seeded | `npm run seed:library` → verify 15 rows in `public_figure_library` table |
+| Vercel deploy | Set all env vars; run `npm run build` on Vercel |
+
+---
+
+## AUTH — Configuration Required (Not Code Issues)
+
+Both auth methods are **fully implemented** in `components/auth/SignInForm.tsx`.  
+The following **Supabase dashboard** steps are required to make them work:
+
+### Google OAuth Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials
+2. Create OAuth 2.0 Client ID (Web application)
+3. Set **Authorized redirect URIs:**
+   - `http://localhost:3000/callback` (development)
+   - `https://your-domain.com/callback` (production)
+4. Copy `Client ID` and `Client Secret`
+5. In Supabase Dashboard → Authentication → Providers → Google:
+   - Enable Google provider
+   - Paste Client ID and Client Secret
+6. In Supabase Dashboard → Authentication → URL Configuration:
+   - Site URL: `http://localhost:3000`
+   - Redirect URLs: add `http://localhost:3000/callback`
+
+### Magic Link (Individual User Login — No Google)
+
+Magic link works with **zero additional setup** once Supabase email provider is enabled:
+
+1. Supabase Dashboard → Authentication → Providers → Email
+2. Enable "Email" provider (enabled by default)
+3. Optionally configure SMTP (Supabase provides a free tier SMTP)
+
+Users can sign in by entering their email → they receive a magic link → clicking it authenticates them. No password required. This is the solo user flow.
+
+### Env Variables Required
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-public-key>
+SUPABASE_SERVICE_ROLE_KEY=<service-role-secret>
+OPENAI_API_KEY=<key>               # required for AI features
+BEY_API_KEY=<key>                  # required for live avatar sessions
+BEY_AGENT_ID=<agent-id>            # required for live avatar sessions
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+Test with: `npm run setup:check`
+
+---
+
+## Recommended Fix Order
 
 ```
-Step 1:  Fix N1 (consolidate Supabase clients into lib/db.ts)
-Step 2:  Fix N2 (consolidate auth into lib/auth.ts)
-Step 3:  Fix N3 (decide on /api/documents upload route)
-Step 4:  Fix T1 (loosen PersonalityJSON schema)
-Step 5:  Fix T2 (update chunk size in lib/embeddings.ts)
-Step 6:  Install missing shadcn/ui components
-Step 7:  Build /components/shared/ (Sidebar, AppShell, EmptyState, LoadingSkeleton)
-Step 8:  Update app/(app)/layout.tsx to use real Sidebar + AppShell
-Step 9:  Build /components/targets/ (all 8 files)
-Step 10: Build app/(app)/targets/ pages (4 pages)
-Step 11: Build /components/documents/ + documents pages
-Step 12: Build /components/scenarios/ + scenarios pages
-Step 13: Build /components/sessions/ + sessions/[id]/page.tsx
-Step 14: Build /components/reports/ + reports/[id]/page.tsx
-Step 15: Build /components/progress/ + progress/page.tsx
-Step 16: Create 14 missing library JSON profiles → run npm run seed:library
-Step 17: Build /components/library/ + library pages
-Step 18: Build /components/admin/ + admin/page.tsx + assignments/page.tsx
-Step 19: Build settings/page.tsx
-Step 20: Fix S1 (plan column), S6 (duplicate callback), S7 (root AGENTS.md)
+1.  Supabase: Run RUN_PENDING.sql → npm run backend:ready
+2.  Supabase: Configure Google OAuth in dashboard
+3.  Add OPENAI_API_KEY → npm run test:openai
+4.  Add BEY_API_KEY + BEY_AGENT_ID → npm run test:bp
+5.  Code: Fix T1 (PersonalityJSON schema) in lib/schemas.ts + types/index.ts
+6.  Code: Fix T2 (chunk size) in lib/embeddings.ts
+7.  Code: Fix N3 (decide on /api/documents upload route)
+8.  Code: Fix N1 (consolidate Supabase clients into lib/db.ts)
+9.  Code: Fix N2 (merge auth helpers into lib/auth.ts)
+10. npm run seed:library
+11. Phase L: Mobile audit, loading states, error states, rate limiting
+12. Phase M: Safety audit, RLS test, E2E session loop, Vercel deploy
 ```

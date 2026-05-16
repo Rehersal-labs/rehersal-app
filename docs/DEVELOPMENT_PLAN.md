@@ -1,90 +1,93 @@
 # Rehearsal — Development Plan
 
-Master plan for building the MVP. **Repo:** [github.com/Rehersal-labs/rehersal-app](https://github.com/Rehersal-labs/rehersal-app)
+**Updated:** 2026-05-16  
+**Repo:** [github.com/Rehersal-labs/rehersal-app](https://github.com/Rehersal-labs/rehersal-app)  
+**Current state:** Waves 1–5 complete. Wave 6 (QA + deploy) in progress.
 
 ---
 
-## Critical Path (Sequential — Do First)
+## Build Wave Status
 
-These block everything else. **One developer owns this until merged.**
+### Wave 1 — Foundation ✅ Complete
+- [x] Migrations 001–008 (schema, RLS, pgvector, indexes, audit, library, storage)
+- [x] TypeScript types (`types/index.ts`) + Zod schemas (`lib/schemas.ts`)
+- [x] DB clients (`lib/db.ts`) + auth helpers (`lib/auth.ts`)
+- [x] Design system (`globals.css`, `tailwind.config.ts`, shadcn theme, custom tokens)
+- [x] `.env.local.example` with all variables
 
-| Step | Deliverable | Owner suggestion |
-|------|-------------|------------------|
-| **1** | `supabase/migrations/001–004` | Backend lead |
-| **2** | `types/index.ts` + `lib/schemas.ts` | Backend lead |
-| **3** | `lib/db.ts` + `lib/auth.ts` | Backend lead |
+### Wave 2 — Auth & Shell ✅ Complete
+- [x] Sign-in UI: Google OAuth + magic link (`components/auth/SignInForm.tsx`)
+- [x] Auth callbacks: `/callback` + `/api/auth/callback`
+- [x] 5-step onboarding flow (`OnboardingFlow.tsx` + `/api/onboarding`)
+- [x] App shell + role-aware sidebar (`AppShell.tsx`, `Sidebar.tsx`)
+- [x] Root redirect: `/` → `/dashboard` (auth) or `/signin` (no auth)
 
-**Acceptance Step 1:** All migrations run on Supabase; 19 tables + RLS visible.  
-**Acceptance Step 2:** `tsc --noEmit` passes; all tables have types + Zod schemas.  
-**Acceptance Step 3:** Auth helpers work in a test API route.
+### Wave 3 — Core Product ✅ Complete
+- [x] Target builder: 4-step UI + reconstruction API + scraper pipeline
+- [x] Documents: upload (PDF/DOCX/TXT), extract, embed, retrieve
+- [x] Scenarios: configurator, 10 conversation types, difficulty 1–5, avatar brief
+- [x] Library: 15 JSON profiles, browser UI, clone to workspace
+- [x] All 10 avatar system prompt templates in `lib/prompts.ts`
 
----
+### Wave 4 — Session Loop ✅ Complete
+- [x] Beyond Presence integration (`lib/beyondPresence.ts`, `npm run test:bp`)
+- [x] Live session page: pre-check → embed → timer → coaching break → end
+- [x] Session end: sync transcript, trigger evaluation, poll for report
+- [x] Evaluation pipeline: `lib/evaluator.ts` → `lib/reportBuilder.ts`
+- [x] Feedback report: scores, moments, transcript, PDF export
 
-## Parallel Tracks (After Step 1–3 merged)
+### Wave 5 — Team & Polish ✅ Complete (UI)
+- [x] Team assignments: coach assigns → learner completes
+- [x] Admin view: team pulse, member table, skill gap chart
+- [x] Company documents: admin uploads, team reads
+- [x] Progress dashboard: improvement chart, skill radar, streak tracker
+- [x] Settings: solo (general/account/data) + team (members/invites/data)
 
-Open separate branches per track. See [TASK_ASSIGNMENTS.md](./TASK_ASSIGNMENTS.md).
+### Wave 6 — QA & Deploy ⚠️ In Progress
 
-| Track | Focus | Branch prefix |
-|-------|--------|---------------|
-| **A — Frontend** | Pages, components, design system | `feat/ui-*` |
-| **B — Backend** | API routes, lib pipelines, scraper | `feat/api-*` |
-| **C — AI & Content** | prompts, library JSON, seed scripts | `feat/content-*` |
-
----
-
-## Build Order (Recommended)
-
-### Wave 1 — Foundation (blocking)
-1. Migrations 001–004  
-2. Types + schemas  
-3. DB + auth clients  
-4. Design system (`globals.css`, `tailwind.config.ts`, shadcn theme)  
-5. `.env.local.example`  
-
-### Wave 2 — Auth & shell
-6. Sign-in + callback + onboarding  
-7. App shell + role-aware sidebar  
-8. Root redirect (`/` → dashboard or signin)  
-
-### Wave 3 — Core product (parallel)
-9. Target builder + reconstruction API  
-10. Documents + embeddings API  
-11. Scenarios + avatar brief  
-12. Library JSON + seed-library script  
-
-### Wave 4 — Session loop (highest risk)
-13. **BP spike:** test `createCall` before live UI  
-14. Sessions API + live session page  
-15. End + sync + evaluate + report UI  
-
-### Wave 5 — Team & polish
-16. Assignments, admin, company docs  
-17. Progress dashboard  
-18. Settings, PDF export  
-19. Rate limiting, safety validation, empty states  
-
-### Wave 6 — QA & deploy
-20. RLS two-user test  
-21. Seed demo workspace  
-22. Vercel deploy + env vars  
+| Step | Status | Notes |
+|------|--------|-------|
+| Code fixes (T1, T2, N1, N2, N3) | ❌ Pending | See fix.md |
+| Google OAuth config in Supabase | ❌ Pending | Dashboard-only step |
+| Run migrations on hosted Supabase | ❌ Pending | `supabase/RUN_PENDING.sql` |
+| Seed library | ❌ Pending | `npm run seed:library` |
+| OpenAI E2E test | ❌ Pending | `npm run test:openai` |
+| BP live session test | ❌ Pending | `npm run test:bp` |
+| Phase L — Polish | ❌ Pending | Mobile, skeletons, errors |
+| Phase M — Safety audit + RLS test | ❌ Pending | See REMAINING_WORK.md |
+| Seed demo workspace | ❌ Pending | `npm run seed:demo` |
+| Vercel production deploy | ❌ Pending | Set all env vars |
 
 ---
 
-## File Ownership (Avoid Merge Conflicts)
+## Integration Checkpoints
+
+| # | Checkpoint | Status | How to verify |
+|---|------------|--------|--------------|
+| CP1 | Migrations + types compile | ✅ Done | `npm run verify:supabase` |
+| CP2 | User can sign in and reach dashboard | ⚠️ Needs Google config | Visit `/signin` → Google OAuth |
+| CP3 | Target reconstruction returns valid PersonalityJSON | ❌ Needs OpenAI key | `POST /api/targets/:id/reconstruct` |
+| CP4 | Document upload embeds chunks in pgvector | ❌ Needs OpenAI key | `POST /api/documents/upload` |
+| CP5 | BP `createCall` returns join URL | ❌ Needs BP keys | `npm run test:bp` |
+| CP6 | Full loop: session → report in < 60s | ❌ Needs all keys | Manual E2E test |
+| CP7 | Solo hides team UI; team shows pulse + assignments | ✅ Done | Verify with two different org modes |
+| CP8 | Success criteria checklist green | ❌ Pending | See docs/SUCCESS_CRITERIA.md |
+
+---
+
+## File Ownership (For Reference)
 
 | Track | Owns |
 |-------|------|
-| **A** | `app/(auth)/*`, `app/(app)/**/page.tsx`, `components/*` |
-| **B** | `app/api/*`, `lib/*` (except `prompts.ts`, `schemas.ts`), `supabase/*`, `scripts/seed-demo.ts` |
-| **C** | `lib/prompts.ts`, `types/index.ts`, `lib/schemas.ts`, `public/library/*.json`, `scripts/seed-library.ts` |
-
-**Rule:** If you must edit another track's file, coordinate in PR description and merge quickly.
+| Backend | `app/api/`, `lib/` (except prompts/schemas), `supabase/`, `scripts/` |
+| Frontend | `app/(auth)/`, `app/(app)/*/page.tsx`, `components/` |
+| AI/Content | `lib/prompts.ts`, `types/index.ts`, `lib/schemas.ts`, `public/library/*.json` |
 
 ---
 
 ## Cursor Task Template
 
-Every task must include:
+For any remaining tasks, use this format:
 
 ```markdown
 **Goal:** [one sentence]
@@ -96,30 +99,10 @@ Every task must include:
 
 ---
 
-## Integration Checkpoints
-
-| Checkpoint | Verify |
-|------------|--------|
-| CP1 | Migrations + types compile |
-| CP2 | User can sign in and reach dashboard |
-| CP3 | Target reconstruction returns valid PersonalityJSON |
-| CP4 | Document upload embeds chunks in pgvector |
-| CP5 | BP `createCall` returns join URL |
-| CP6 | Full loop: session → report in < 60s |
-| CP7 | Solo hides team UI; team shows pulse + assignments |
-| CP8 | Success criteria checklist green |
-
----
-
-## Dependencies Installed (Baseline)
-
-Next.js 14, TypeScript strict, Tailwind 3, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr`, `openai`, `zod`, `@tanstack/react-query`, `react-hook-form`, `cheerio`, `pdf-parse`, `mammoth`, `youtube-transcript`, `recharts`, `@react-pdf/renderer`, `lucide-react`.
-
----
-
 ## Related Docs
 
-- [TASK_ASSIGNMENTS.md](./TASK_ASSIGNMENTS.md) — per-developer tasks  
-- [SETUP.md](./SETUP.md) — local dev + env  
-- [MIGRATIONS.md](./MIGRATIONS.md) — SQL implementation guide  
-- [SUCCESS_CRITERIA.md](./SUCCESS_CRITERIA.md) — definition of done  
+- [REMAINING_WORK.md](./REMAINING_WORK.md) — what to do next, in order
+- [STATUS.md](./STATUS.md) — live checklist
+- [fix.md](../fix.md) — full audit with code-level fixes
+- [SUCCESS_CRITERIA.md](./SUCCESS_CRITERIA.md) — definition of done
+- [SETUP.md](./SETUP.md) — local dev + env configuration

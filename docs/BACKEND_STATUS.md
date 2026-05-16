@@ -1,159 +1,171 @@
-# Rehearsal — Backend Status & Remaining Work
+# Rehearsal — Backend Status
 
-For **Member 1 (Platform)**. Frontend is a separate track.
-
-**Folders you own:** `app/api/`, `lib/` (except coordinate on `lib/prompts.ts`), `supabase/`, `scripts/`
+**Updated:** 2026-05-16  
+**State:** All backend code complete. Remaining = configure env + verify pipelines.
 
 ---
 
-## Already implemented
+## ✅ Implemented — All Done
 
 ### Database (`supabase/migrations/`)
 
-| Migration | Contents |
-|-----------|----------|
-| 001 | Core schema (19 tables) |
-| 002 | RLS policies |
-| 003 | pgvector extension |
-| 004 | Query indexes |
-| 005 | audit_logs + column fixes |
-| 006 | Library repair + `match_document_chunks` RPC |
-| 007 | public_figure_library fixes |
-| 008 | Storage buckets `documents`, `reports` |
+| Migration | Contents | Status |
+|-----------|----------|--------|
+| 001 | Core schema (19 tables) | ✅ |
+| 002 | RLS policies | ✅ |
+| 003 | pgvector extension + ivfflat index | ✅ |
+| 004 | Query indexes | ✅ |
+| 005 | audit_logs table + column fixes | ✅ |
+| 006 | Library repair + `match_document_chunks` RPC | ✅ |
+| 007 | public_figure_library fixes | ✅ |
+| 008 | Storage buckets `documents` + `reports` | ✅ |
 
-### API routes (`app/api/`)
+**To apply:** Paste `supabase/RUN_PENDING.sql` into Supabase SQL Editor.
 
-All routes from [API_SPEC_FULL.md](./API_SPEC_FULL.md):
+---
 
-- Auth: `/api/auth/callback`, `/callback`
-- Me: `/api/me`
-- Onboarding: `/api/onboarding`
-- Targets: CRUD + sources + reconstruct + preview
-- Documents: list, create (JSON), **upload (multipart)**, delete, embed
-- Company documents: list, create, delete (owner)
-- Scenarios: CRUD
-- Sessions: list, create (+ BP call), get, end, sync-messages, evaluate
-- Reports: get, pdf, rate-accuracy
-- Library: browse, get, clone
-- Admin: sessions, team-report
-- Assignments, coach-comments
-- Webhooks: beyond-presence
-- Health: `/api/health`
+### API Routes (`app/api/`) — 35+ handlers
 
-### Lib pipelines (`lib/`)
+| Domain | Routes | Status |
+|--------|--------|--------|
+| Auth | `/callback`, `/api/auth/callback`, `/api/me` | ✅ |
+| Onboarding | `POST /api/onboarding` | ✅ |
+| Targets | CRUD + sources + reconstruct + preview | ✅ |
+| Documents | list + upload (multipart) + delete + embed | ✅ |
+| Company docs | list + create + delete (owner only) | ✅ |
+| Scenarios | CRUD | ✅ |
+| Sessions | create (+ BP call) + get + end + sync + evaluate | ✅ |
+| Reports | get + PDF + rate-accuracy | ✅ |
+| Library | browse + get + clone | ✅ |
+| Admin | sessions list + team report | ✅ |
+| Team | members list + invite | ✅ |
+| Assignments | list + create | ✅ |
+| Coach comments | create | ✅ |
+| Settings | export | ✅ |
+| Webhooks | beyond-presence | ✅ |
+| Health | GET `/api/health` (incl. `openai_configured` flag) | ✅ |
 
-| Module | Purpose |
-|--------|---------|
-| `openai.ts` | gpt-4o + embeddings + safety scan |
-| `beyondPresence.ts` | createCall, messages, updateAgent |
-| `scraper/*` | native, jina, youtube, orchestrator |
-| `fileParser.ts` | pdf, docx, txt |
-| `reconstruction.ts` | target personality build |
-| `embeddings.ts` | chunk + embed documents |
-| `contextRetriever.ts` | pgvector RPC top-K |
-| `avatarBriefBuilder.ts` | session system prompt |
-| `evaluator.ts` + `reportBuilder.ts` | post-session AI |
-| `pdfExporter.tsx` | PDF → Storage `reports` bucket |
-| `sessionTurns.ts` | BP transcript sync |
-| `auth.ts` + `lib/api/*` | requireAuth, org checks, http helpers |
-| `rateLimit.ts` | AI endpoint limits |
+**Note on document upload:** The spec defines `POST /api/documents` for upload. The actual implementation uses `POST /api/documents/upload` (multipart form data handler). Frontend `DocumentUploader.tsx` must call `/api/documents/upload`.
+
+---
+
+### Lib Pipelines (`lib/`)
+
+| Module | Purpose | Status |
+|--------|---------|--------|
+| `openai.ts` | gpt-4o + embeddings + safety validation | ✅ |
+| `beyondPresence.ts` | createCall, messages, updateAgent, endCall | ✅ |
+| `scraper/` | native (Cheerio), Jina, YouTube, orchestrator | ✅ |
+| `fileParser.ts` | PDF, DOCX, TXT text extraction | ✅ |
+| `reconstruction.ts` | Target personality build from sources | ✅ |
+| `embeddings.ts` | Chunk + embed documents → pgvector | ✅ |
+| `contextRetriever.ts` | pgvector RPC top-K semantic search | ✅ |
+| `avatarBriefBuilder.ts` | Compose BP system prompt | ✅ |
+| `evaluator.ts` | Post-session AI evaluation | ✅ |
+| `reportBuilder.ts` | Evaluation → full feedback report JSON | ✅ |
+| `pdfExporter.tsx` | Report → PDF → Supabase Storage `reports` bucket | ✅ |
+| `sessionTurns.ts` | BP transcript sync to session_turns table | ✅ |
+| `prompts.ts` | All prompt templates (10 avatar types + reconstruction + evaluator) | ✅ |
+| `schemas.ts` | Zod validation + AI safety scan | ✅ |
+| `rateLimit.ts` | In-memory rate limiting for AI routes | ✅ |
+| `auth.ts` | getSession, requireSession, provisionNewUser | ✅ |
+| `api/auth.ts` | requireAuth, requireOwner, requireCoach | ✅ |
+| `api/http.ts` | jsonOk, jsonError helpers | ✅ |
+| `api/org.ts` | Org ownership checks | ✅ |
+
+---
 
 ### Scripts
 
-| Command | Purpose |
-|---------|---------|
-| `npm run setup:check` | Env validation |
-| `npm run verify:supabase` | Tables + RPC check |
-| `npm run seed:library` | 15 library profiles |
-| `npm run seed:demo` | Demo org + sample data |
-| `npm run test:bp` | Beyond Presence spike |
-| `npm run smoke:health` | GET /api/health |
-| `npm run backend:ready` | Setup + verify + seed + BP (no OpenAI) |
-| `npm run storage:setup` | Ensure buckets (script) |
-
-### New APIs (no OpenAI)
-
-| Route | Purpose |
-|-------|---------|
-| `POST /api/documents/upload` | Multipart file upload + extract text |
-| `GET /api/team/members` | List org members (coach/owner) |
-| `GET /api/settings/export` | Export workspace JSON (owner) |
-| `GET /api/health` | Extended status incl. `openai_configured` |
-
-AI routes return **503** `OPENAI_NOT_CONFIGURED` until key is set.
+| Command | Purpose | Status |
+|---------|---------|--------|
+| `npm run setup:check` | Env var validation | ✅ |
+| `npm run verify:supabase` | Tables + RPC check | ✅ |
+| `npm run backend:ready` | Full readiness (no OpenAI) | ✅ |
+| `npm run seed:library` | Insert 15 library profiles | ✅ |
+| `npm run seed:demo` | Demo org + sample data | ✅ |
+| `npm run test:bp` | Beyond Presence spike | ✅ |
+| `npm run test:openai` | OpenAI smoke test | ✅ |
+| `npm run smoke:health` | GET /api/health | ✅ |
+| `npm run storage:setup` | Ensure Supabase Storage buckets | ✅ |
 
 ---
 
-## Remaining (backend)
+## ❌ Remaining (Backend)
 
-### P0 — Without OpenAI (do now)
-
-| # | Task | How |
-|---|------|-----|
-| 1 | Run pending SQL | Supabase SQL Editor → `supabase/RUN_PENDING.sql` |
-| 2 | Backend readiness | `npm run backend:ready` |
-| 3 | Verify health | `GET /api/health` shows `openai_configured: false` until key added |
-
-### P0 — After OpenAI key added (test later)
+### P0 — Environment Setup (Do First)
 
 | # | Task | How |
 |---|------|-----|
-| 4 | Add `OPENAI_API_KEY` | `.env.local` |
-| 5 | Smoke test | `npm run test:openai` |
-| 6 | Full AI E2E | See [OPENAI.md](./OPENAI.md) |
+| 1 | Apply pending SQL migrations | Supabase SQL Editor → paste `supabase/RUN_PENDING.sql` |
+| 2 | Verify readiness | `npm run backend:ready` |
+| 3 | Add `OPENAI_API_KEY` | `.env.local` |
+| 4 | OpenAI smoke test | `npm run test:openai` |
+| 5 | Add `BEY_API_KEY` + `BEY_AGENT_ID` | `.env.local` |
+| 6 | BP smoke test | `npm run test:bp` |
+| 7 | Configure Google OAuth | Supabase Dashboard → Auth → Providers |
 
-**OpenAI code is implemented** in `lib/reconstruction.ts`, `lib/embeddings.ts`, `lib/evaluator.ts`, `lib/reportBuilder.ts`, `lib/prompts.ts`.
+---
 
-### P1 — Verify pipelines (manual / scripts)
+### P1 — Code Fixes (Required Before Production)
 
-| # | Task | Command |
-|---|------|---------|
-| 5 | BP call works | `npm run test:bp` |
-| 6 | Upload + embed doc | `POST /api/documents/upload` with multipart |
-| 7 | Reconstruct target | `POST /api/targets/:id/reconstruct` |
-| 8 | Full session loop | create session → end → evaluate → GET report |
-| 9 | PDF export | `POST /api/reports/:id/pdf` |
+| # | Fix | File | Impact |
+|---|-----|------|--------|
+| T1 | PersonalityJSON Zod schema too strict | `lib/schemas.ts`, `types/index.ts` | Reconstruction silently fails |
+| T2 | Chunk size ~4x too small | `lib/embeddings.ts` | Poor retrieval quality |
+| N1 | 3 duplicate Supabase client files | `lib/db.ts`, `lib/supabase/browser.ts`, `lib/supabaseAdmin.ts` | Import inconsistency |
+| N2 | Auth split across 3 files | `lib/auth.ts`, `lib/auth-helpers.ts`, `lib/auth-types.ts` | Confusing imports |
+| N3 | Document upload route mismatch | `app/api/documents/` | Frontend must use `/upload` |
 
-### P2 — Hardening (optional MVP+)
+See `fix.md` for exact code changes.
+
+---
+
+### P1 — Pipeline Verification (With Real Keys)
+
+| # | Task | Command / How |
+|---|------|---------------|
+| 1 | Upload + embed doc | `POST /api/documents/upload` (multipart) → check `embedding_status = complete` |
+| 2 | Reconstruct target | `POST /api/targets/:id/reconstruct` → check `status = complete`, `personality_json` populated |
+| 3 | Full session loop | Create session → join → end → evaluate → `GET /api/reports/:id` |
+| 4 | PDF export | `POST /api/reports/:id/pdf` → check `pdf_url` returned |
+
+---
+
+### P2 — Hardening (Pre-Production)
 
 | # | Task | Notes |
 |---|------|-------|
-| 10 | RLS two-user test | Two Supabase users, confirm no cross-org reads |
-| 11 | `BEY_WEBHOOK_SECRET` | Production webhook signature |
-| 12 | Team invites | Currently audit_log only; needs Resend + invite API |
-| 13 | Settings export/delete API | Not in MVP API spec; add if product needs it |
-| 14 | Async job queue | Reconstruct/evaluate use `void fn()` — OK for MVP; consider Inngest later |
-
-### Not backend (other tracks)
-
-| Item | Owner |
-|------|--------|
-| Sign-in UI | Frontend |
-| All `app/(app)/` pages | Frontend |
-| `components/` | Frontend |
-| `lib/prompts.ts` content tuning | AI/content (coordinate merges) |
+| 1 | RLS two-user test | Two users in separate orgs — confirm no cross-read |
+| 2 | Verify rate limiting | Check `lib/rateLimit.ts` is called on reconstruct, evaluate, embed |
+| 3 | Audit all API routes for Zod body validation | Every POST/PATCH must validate request body |
+| 4 | `BEY_WEBHOOK_SECRET` | Verify webhook signature in production |
+| 5 | Team invites | Currently audit-log only. Wire `RESEND_API_KEY` for actual invite emails |
+| 6 | Safety audit | Run evaluator output through `validateAISafety()` — check no forbidden phrases |
 
 ---
 
-## Quick test: document upload
+## Quick Test: Document Upload
 
 ```bash
-# With dev server running and a valid session cookie:
+# With dev server running and valid session cookie:
 curl -X POST http://localhost:3000/api/documents/upload \
   -H "Cookie: <your-supabase-session-cookie>" \
   -F "file=@./resume.pdf" \
   -F "doc_type=my_background"
 ```
 
+Expected: `{ document: { id, filename, embedding_status: "pending" } }` — embedding runs async.
+
 ---
 
-## Definition of done (backend)
+## Definition of Done (Backend)
 
-- [ ] `npm run setup:check` — all required env green
+- [ ] `npm run setup:check` — all required vars green
 - [ ] `npm run verify:supabase` — all checks pass
 - [ ] `npm run seed:library` — 15 rows in `public_figure_library`
 - [ ] `npm run test:bp` — returns join URL
-- [ ] One full flow: upload doc → create target → reconstruct → session → report
-- [ ] `npm run build` passes
-
-Update this file when you complete a P0/P1 item.
+- [ ] `npm run test:openai` — returns embedding vector
+- [ ] Full E2E loop: upload doc → create target → reconstruct → session → report
+- [ ] `npm run build` passes (currently passing)
+- [ ] Code fixes T1, T2, N1, N2, N3 applied
