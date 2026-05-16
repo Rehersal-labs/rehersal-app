@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     .from("coach_comments")
     .insert({
       report_id: parsed.data.report_id,
-      session_id: parsed.data.session_id,
+      session_id: report.session_id,
       coach_id: auth.session.user.id,
       turn_sequence: parsed.data.turn_sequence ?? null,
       comment_text: parsed.data.comment_text,

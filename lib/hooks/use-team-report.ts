@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 export interface TeamReport {
   sessions_this_week: number;
   avg_team_score: number;
+  skill_gaps: { dimension: string; avg: number }[];
   members: {
     user_id: string;
     name: string;

@@ -282,7 +282,7 @@ export function useStartSession() {
       ),
     onSuccess: (_data, sessionId) => {
       qc.invalidateQueries({ queryKey: ["sessions"] });
-      qc.invalidateQueries({ queryKey: ["session", sessionId] });
+      qc.invalidateQueries({ queryKey: ["sessions", sessionId] });
     },
   });
 }

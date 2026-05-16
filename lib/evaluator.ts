@@ -106,6 +106,9 @@ export async function evaluateSession(sessionId: string): Promise<void> {
     await supabase.from("evaluations").upsert(
       {
         session_id: sessionId,
+        target_profile_id: session.target_profile_id,
+        user_id: session.user_id,
+        conversation_type: (scenario as Scenario).conversation_type,
         overall_score: evaluation.overall_score,
         target_fit_score: evaluation.target_fit_score,
         rubric_scores_json: evaluation.rubric_scores,
