@@ -8,14 +8,18 @@
     "start": "next start",
     "lint": "next lint",
     "seed:library": "tsx --env-file=.env.local scripts/seed-library.ts",
+    "validate:library": "tsx scripts/validate-library.ts",
+    "enrich:library": "tsx scripts/enrich-library-metadata.ts",
     "seed:demo": "tsx --env-file=.env.local scripts/seed-demo.ts",
     "embed:docs": "tsx --env-file=.env.local scripts/embed-existing-docs.ts",
+    "setup:check": "tsx --env-file=.env.local scripts/setup-check.ts",
     "verify:supabase": "tsx --env-file=.env.local scripts/verify-supabase.ts",
     "inspect:library": "tsx --env-file=.env.local scripts/inspect-library-table.ts",
     "storage:setup": "tsx --env-file=.env.local scripts/ensure-storage-buckets.ts",
     "db:sql": "tsx --env-file=.env.local scripts/run-sql-file.ts",
     "db:repair:007": "tsx --env-file=.env.local scripts/run-sql-file.ts supabase/migrations/007_fix_public_figure_library.sql",
-    "smoke:health": "tsx --env-file=.env.local scripts/smoke-health.ts"
+    "smoke:health": "tsx --env-file=.env.local scripts/smoke-health.ts",
+    "test:bp": "tsx --env-file=.env.local scripts/test-bp-call.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
