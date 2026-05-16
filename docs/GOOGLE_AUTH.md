@@ -36,7 +36,22 @@ Copy **Client ID** and **Client Secret**.
 
 ---
 
-## Step 2 — Supabase Dashboard
+## Step 2 — Supabase (automated or manual)
+
+### Option A — Automated (recommended)
+
+1. Create access token: [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens)
+2. Add to `.env.local`:
+   ```env
+   SUPABASE_ACCESS_TOKEN=sbp_xxxxxxxx
+   ```
+3. Run:
+   ```bash
+   npm run configure:google-auth
+   ```
+   This enables Google + sets Site URL and redirect URLs via Supabase Management API.
+
+### Option B — Manual dashboard
 
 1. [supabase.com](https://supabase.com) → your project
 2. **Authentication → Providers → Google**

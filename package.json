@@ -24,7 +24,8 @@
     "smoke:health": "tsx --env-file=.env.local scripts/smoke-health.ts",
     "backend:ready": "tsx --env-file=.env.local scripts/backend-ready.ts",
     "test:openai": "tsx --env-file=.env.local scripts/test-openai.ts",
-    "test:bp": "tsx --env-file=.env.local scripts/test-bp-call.ts"
+    "test:bp": "tsx --env-file=.env.local scripts/test-bp-call.ts",
+    "configure:google-auth": "tsx --env-file=.env.local scripts/configure-google-auth.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
