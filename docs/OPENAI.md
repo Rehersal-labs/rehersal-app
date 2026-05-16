@@ -1,6 +1,13 @@
-# Rehearsal — OpenAI Integration (Backend)
+# Rehearsal — LLM Integration (Backend)
 
-Use this when you add `OPENAI_API_KEY` to `.env.local`. **Test later** with `npm run test:openai`.
+**Provider:** set `LLM_PROVIDER=gemini` or `openai` in `.env.local`.
+
+| Provider | Env | Test |
+|----------|-----|------|
+| **Gemini** (temporary default) | `GEMINI_API_KEY`, `GEMINI_MODEL=gemini-2.5-flash` | `npm run test:llm` |
+| OpenAI | `OPENAI_API_KEY` | `npm run test:openai` |
+
+Implementation: **`lib/llm.ts`** (routes all pipelines). **`lib/openai.ts`** re-exports for compatibility.
 
 ---
 

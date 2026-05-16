@@ -1,14 +1,15 @@
-import { isOpenAIConfigured } from "@/lib/openai";
+import { getLLMProvider, isLLMConfigured } from "@/lib/llm";
 import { jsonError } from "./http";
 
-/** Returns 503 response when OpenAI key is missing; otherwise null. */
+/** Returns 503 when no LLM key is configured (Gemini or OpenAI). */
 export function requireOpenAIConfigured(): Response | null {
-  if (!isOpenAIConfigured()) {
-    return jsonError(
-      "OpenAI is not configured. Add OPENAI_API_KEY to enable this feature.",
-      503,
-      "OPENAI_NOT_CONFIGURED"
-    );
+  if (!isLLMConfigured()) {
+    const provider = getLLMProvider();
+    const hint =
+      provider === "gemini"
+        ? "Add GEMINI_API_KEY and set LLM_PROVIDER=gemini in .env.local."
+        : "Add OPENAI_API_KEY or switch LLM_PROVIDER=gemini with GEMINI_API_KEY.";
+    return jsonError(`LLM is not configured. ${hint}`, 503, "LLM_NOT_CONFIGURED");
   }
   return null;
 }

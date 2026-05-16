@@ -55,7 +55,7 @@ export async function embedDocument(documentId: string): Promise<void> {
       .from("user_documents")
       .update({ embedding_status: "failed" })
       .eq("id", documentId);
-    throw new Error("OPENAI_NOT_CONFIGURED");
+    throw new Error("LLM_NOT_CONFIGURED");
   }
 
   await supabase

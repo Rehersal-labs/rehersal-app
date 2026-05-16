@@ -17,7 +17,7 @@ export async function reconstructTarget(targetId: string): Promise<void> {
       .from("target_profiles")
       .update({
         status: "failed",
-        error_message: "OPENAI_API_KEY not configured",
+        error_message: "LLM not configured (set GEMINI_API_KEY or OPENAI_API_KEY)",
       })
       .eq("id", targetId);
     return;

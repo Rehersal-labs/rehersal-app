@@ -82,12 +82,42 @@ export const LibraryCategorySchema = z.enum([
 
 // ─── Personality JSON ───────────────────────────────────────────────────────
 
+const nullableStr = (fallback: string) =>
+  z
+    .union([z.string(), z.null(), z.undefined()])
+    .transform((v) => (v?.trim() ? v : fallback));
+
 export const CommunicationStyleSchema = z.object({
-  directness: z.string(),
-  formality: z.string(),
-  pace: z.string(),
-  listening_style: z.string(),
+  directness: nullableStr("direct"),
+  formality: nullableStr("professional"),
+  pace: nullableStr("moderate"),
+  listening_style: nullableStr("active"),
 });
+
+export function coercePersonalityJson(input: unknown): unknown {
+  if (!input || typeof input !== "object") return input;
+  const o = { ...(input as Record<string, unknown>) };
+
+  if (o.communication_style && typeof o.communication_style === "object") {
+    const cs = { ...(o.communication_style as Record<string, unknown>) };
+    for (const key of ["directness", "formality", "pace", "listening_style"]) {
+      if (cs[key] === null || cs[key] === undefined) cs[key] = "unknown";
+    }
+    o.communication_style = cs;
+  }
+
+  if (o.confidence && typeof o.confidence === "object") {
+    const conf = { ...(o.confidence as Record<string, unknown>) };
+    for (const [k, v] of Object.entries(conf)) {
+      if (v === "high" || v === "medium" || v === "low") continue;
+      if (typeof v === "object") delete conf[k];
+      else conf[k] = "medium";
+    }
+    o.confidence = conf;
+  }
+
+  return o;
+}
 
 export const PersonalityJSONSchema = z.object({
   communication_style: CommunicationStyleSchema,

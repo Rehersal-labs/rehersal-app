@@ -1,5 +1,5 @@
 import { jsonOk } from "@/lib/api/http";
-import { isOpenAIConfigured } from "@/lib/openai";
+import { getLLMProvider, isLLMConfigured } from "@/lib/llm";
 import { isLibraryDbReady } from "@/lib/libraryDbReady";
 
 export async function GET() {
@@ -14,7 +14,9 @@ export async function GET() {
     status: "ok",
     service: "rehearsal-api",
     checks: {
-      openai_configured: isOpenAIConfigured(),
+      llm_configured: isLLMConfigured(),
+      llm_provider: getLLMProvider(),
+      openai_configured: isLLMConfigured(),
       supabase_url_set: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()),
       bey_configured: Boolean(
         process.env.BEY_API_KEY?.trim() && process.env.BEY_AGENT_ID?.trim()

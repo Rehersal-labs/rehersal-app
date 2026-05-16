@@ -24,10 +24,12 @@
     "smoke:health": "tsx --env-file=.env.local scripts/smoke-health.ts",
     "backend:ready": "tsx --env-file=.env.local scripts/backend-ready.ts",
     "test:openai": "tsx --env-file=.env.local scripts/test-openai.ts",
+    "test:llm": "tsx --env-file=.env.local scripts/test-llm.ts",
     "test:bp": "tsx --env-file=.env.local scripts/test-bp-call.ts",
     "configure:google-auth": "tsx --env-file=.env.local scripts/configure-google-auth.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-avatar": "^1.1.11",

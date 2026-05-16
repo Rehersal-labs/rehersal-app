@@ -17,8 +17,12 @@ const REQUIRED: { key: string; label: string }[] = [
 ];
 
 const RECOMMENDED: { key: string; label: string }[] = [
-  { key: "OPENAI_API_KEY", label: "OpenAI API key (reconstruct, embed, evaluate)" },
   { key: "JINA_API_KEY", label: "Jina Reader API key" },
+];
+
+const LLM_KEYS: { key: string; label: string }[] = [
+  { key: "GEMINI_API_KEY", label: "Gemini API key (when LLM_PROVIDER=gemini)" },
+  { key: "OPENAI_API_KEY", label: "OpenAI API key (when LLM_PROVIDER=openai)" },
 ];
 
 const OPTIONAL: string[] = [
@@ -80,6 +84,30 @@ function main() {
     console.log(`  ✓ ${label}`);
   }
 
+  const llmProvider = (env.LLM_PROVIDER?.trim() || "gemini").toLowerCase();
+  const geminiKey = env.GEMINI_API_KEY?.trim() ?? "";
+  const openaiKey = env.OPENAI_API_KEY?.trim() ?? "";
+  const llmReady =
+    (llmProvider === "gemini" && geminiKey) ||
+    (llmProvider === "openai" && openaiKey) ||
+    geminiKey ||
+    openaiKey;
+
+  if (llmReady) {
+    const active =
+      llmProvider === "openai" && openaiKey
+        ? "openai"
+        : geminiKey
+          ? "gemini"
+          : "openai";
+    console.log(`  ✓ LLM (${active}, LLM_PROVIDER=${llmProvider})`);
+  } else {
+    console.log(
+      `  ⚠ LLM — set GEMINI_API_KEY (LLM_PROVIDER=gemini) or OPENAI_API_KEY`
+    );
+    warnings++;
+  }
+
   for (const { key, label } of RECOMMENDED) {
     const val = env[key]?.trim() ?? "";
     if (!val) {
@@ -88,6 +116,12 @@ function main() {
     } else {
       console.log(`  ✓ ${label}`);
     }
+  }
+
+  console.log("\nLLM keys (optional if other provider set):");
+  for (const { key, label } of LLM_KEYS) {
+    const val = env[key]?.trim() ?? "";
+    console.log(`  ${val ? "✓" : "○"} ${label}`);
   }
 
   console.log("\nOptional:");
