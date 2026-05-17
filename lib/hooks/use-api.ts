@@ -111,10 +111,13 @@ export function useReport(id: string) {
     queryKey: ["reports", id],
     queryFn: () =>
       apiFetch<{
-        report: FeedbackReport;
+        report: FeedbackReport & { improvement_plan?: unknown[] };
         evaluation: { overall_score: number; target_fit_score: number } | null;
         coach_comments: unknown[];
         scenario_id: string | null;
+        coach_approved: boolean | null;
+        coach_reviewed_at: string | null;
+        is_coach: boolean;
         turns: SessionTurn[];
       }>(`/api/reports/${id}`),
     enabled: !!id,

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Copy, Download } from "lucide-react";
+import { CheckCircle2, Copy, Download, ShieldCheck } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { ExecutiveSummary } from "@/components/reports/ExecutiveSummary";
@@ -11,10 +12,11 @@ import { CommunicationNotes } from "@/components/reports/CommunicationNotes";
 import { TranscriptViewer } from "@/components/reports/TranscriptViewer";
 import { AccuracyRater } from "@/components/reports/AccuracyRater";
 import { CoachCommentBox } from "@/components/reports/CoachCommentBox";
+import { ImprovementPlan } from "@/components/reports/ImprovementPlan";
 import { ScoreGauge } from "@/components/reports/ScoreGauge";
 import { useReport } from "@/lib/hooks/use-api";
 import { CONVERSATION_TYPES } from "@/lib/constants";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import type { CoachComment, SessionTurn } from "@/types";
 
@@ -26,11 +28,12 @@ export function FeedbackReport({
   showCoachTools?: boolean;
 }) {
   const { data, isLoading } = useReport(reportId);
+  const queryClient = useQueryClient();
   const [exporting, setExporting] = useState(false);
 
   if (isLoading || !data) return <LoadingSkeleton rows={8} />;
 
-  const { report, evaluation, coach_comments, scenario_id, turns } = data;
+  const { report, evaluation, coach_comments, scenario_id, turns, coach_approved, is_coach } = data;
   const sessionTurns = (turns ?? []) as SessionTurn[];
   const json = report.report_json;
   const typeLabel =
@@ -39,6 +42,33 @@ export function FeedbackReport({
 
   const overall = evaluation?.overall_score ?? json.overall_score;
   const targetFit = evaluation?.target_fit_score ?? json.target_fit_score;
+  const isCoachUser = showCoachTools || is_coach;
+  const improvementPlan = (report.improvement_plan ?? []) as {
+    goal: string;
+    actions: string[];
+    target_date?: string;
+    status: "pending" | "done";
+  }[];
+
+  async function toggleApproval() {
+    try {
+      const res = await fetch(`/api/sessions/${report.session_id}/approve`, {
+        method: "POST",
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error ?? "Failed");
+      toast({
+        title: body.approved ? "Session approved" : "Approval removed",
+      });
+      void queryClient.invalidateQueries({ queryKey: ["reports", reportId] });
+    } catch (e) {
+      toast({
+        title: "Could not update approval",
+        description: e instanceof Error ? e.message : "Try again",
+        variant: "destructive",
+      });
+    }
+  }
 
   async function exportPdf() {
     setExporting(true);
@@ -75,14 +105,43 @@ export function FeedbackReport({
 
   return (
     <article className="animate-fade-in-up">
-      <div className="flex justify-end gap-2 px-4 pt-6 sm:px-8">
-        <Button variant="outline" size="sm" onClick={() => void copyLink()}>
-          <Copy className="mr-2 h-4 w-4" /> Share
-        </Button>
-        <Button variant="outline" size="sm" disabled={exporting} onClick={() => void exportPdf()}>
-          <Download className="mr-2 h-4 w-4" />
-          {exporting ? "Exporting…" : "Export PDF"}
-        </Button>
+      <div className="flex items-center justify-between gap-2 px-4 pt-6 sm:px-8 flex-wrap">
+        {/* Coach approval badge */}
+        {isCoachUser && (
+          <button
+            type="button"
+            onClick={() => void toggleApproval()}
+            className={cn(
+              "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-small transition-colors",
+              coach_approved
+                ? "border-success/40 bg-success/10 text-success hover:bg-success/20"
+                : "border-border-subtle bg-surface text-foreground-tertiary hover:border-accent/40 hover:text-accent"
+            )}
+          >
+            {coach_approved ? (
+              <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
+            ) : (
+              <ShieldCheck className="h-3.5 w-3.5" strokeWidth={1.5} />
+            )}
+            {coach_approved ? "Approved" : "Mark as reviewed"}
+          </button>
+        )}
+        {!isCoachUser && coach_approved && (
+          <span className="flex items-center gap-1.5 text-small text-success">
+            <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
+            Coach approved
+          </span>
+        )}
+        {!isCoachUser && !coach_approved && <span />}
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => void copyLink()}>
+            <Copy className="mr-2 h-4 w-4" /> Share
+          </Button>
+          <Button variant="outline" size="sm" disabled={exporting} onClick={() => void exportPdf()}>
+            <Download className="mr-2 h-4 w-4" />
+            {exporting ? "Exporting…" : "Export PDF"}
+          </Button>
+        </div>
       </div>
 
       <header className="bg-highlight-glow px-4 py-10 sm:px-8 sm:py-12">
@@ -178,6 +237,12 @@ export function FeedbackReport({
             existing={coach_comments as CoachComment[]}
           />
         )}
+
+        <ImprovementPlan
+          reportId={reportId}
+          initialPlan={improvementPlan}
+          isCoach={isCoachUser}
+        />
 
         <section className="grid gap-4 sm:grid-cols-2">
           <Link

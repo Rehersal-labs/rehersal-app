@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import {
   BookOpen,
   ClipboardList,
+  CreditCard,
   FileText,
   LayoutDashboard,
   Library,
   Settings,
+  ShieldCheck,
   Target,
   TrendingUp,
   Users,
@@ -38,9 +40,11 @@ export function Sidebar({ session, pendingAssignments = 0, className, onNavigate
   const team  = isTeamMode(session.organization);
   const coach = canManageTeam(session.membership.role);
 
+  const isOwner = session.membership.role === "owner";
   const nav = [...baseNav];
   if (team) nav.push({ href: "/assignments", label: "Assignments", icon: BookOpen });
   if (team && coach) nav.push({ href: "/admin", label: "Admin", icon: Users });
+  if (coach) nav.push({ href: "/rubrics", label: "Rubrics", icon: ShieldCheck });
 
   const initials =
     session.user.name
@@ -136,6 +140,16 @@ export function Sidebar({ session, pendingAssignments = 0, className, onNavigate
           <Settings className="h-4 w-4 text-foreground-tertiary" strokeWidth={1.5} />
           <span>Settings</span>
         </Link>
+        {isOwner && (
+          <Link
+            href="/settings?tab=billing"
+            onClick={onNavigate}
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-small text-foreground-secondary transition-colors hover:bg-surface-elevated hover:text-foreground-primary"
+          >
+            <CreditCard className="h-4 w-4 text-foreground-tertiary" strokeWidth={1.5} />
+            <span>Billing</span>
+          </Link>
+        )}
 
         <div className="flex items-center gap-3 px-3 py-2">
           {/* Avatar */}

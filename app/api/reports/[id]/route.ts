@@ -27,7 +27,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
 
   const { data: session } = await supabase
     .from("sessions")
-    .select("user_id, scenario_id")
+    .select("user_id, scenario_id, coach_approved, coach_reviewed_at")
     .eq("id", report.session_id)
     .single();
 
@@ -60,6 +60,9 @@ export async function GET(_request: Request, { params }: RouteContext) {
     evaluation: evaluation ?? null,
     coach_comments: coach_comments ?? [],
     scenario_id: session?.scenario_id ?? null,
+    coach_approved: session?.coach_approved ?? null,
+    coach_reviewed_at: session?.coach_reviewed_at ?? null,
     turns: turns ?? [],
+    is_coach: isCoach,
   });
 }
