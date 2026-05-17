@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/api/auth";
 import { jsonError, jsonOk, parseJsonBody } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 import { ScenarioConfigSchema } from "@/lib/schemas";
 
 export async function GET() {
@@ -22,6 +23,12 @@ export async function GET() {
 export async function POST(request: Request) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const rl = checkRateLimit(`create-scenario:${auth.session.user.id}`, {
+    maxRequests: 20,
+    windowMs: 60_000,
+  });
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt);
 
   const parsed = await parseJsonBody(request, ScenarioConfigSchema);
   if ("error" in parsed) return parsed.error;

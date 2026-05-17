@@ -2,12 +2,16 @@ import { jsonError, jsonOk } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
 
 export async function POST(request: Request) {
+  // BEY_WEBHOOK_SECRET is required in production to prevent spoofed events.
   const secret = process.env.BEY_WEBHOOK_SECRET;
-  if (secret) {
-    const signature = request.headers.get("x-bey-signature");
-    if (signature !== secret) {
-      return jsonError("Invalid webhook signature", 401);
-    }
+  if (!secret) {
+    console.error("[webhook/beyond-presence] BEY_WEBHOOK_SECRET is not configured — rejecting all webhook events");
+    return jsonError("Webhook not configured", 503);
+  }
+
+  const signature = request.headers.get("x-bey-signature");
+  if (!signature || signature !== secret) {
+    return jsonError("Invalid webhook signature", 401);
   }
 
   let payload: {
@@ -35,6 +39,7 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   if (!session) {
+    // Unknown call ID — acknowledge without error (may be from a different env)
     return jsonOk({ received: true });
   }
 

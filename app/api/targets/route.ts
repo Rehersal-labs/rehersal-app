@@ -2,6 +2,7 @@ import { requireAuth } from "@/lib/api/auth";
 import { jsonError, jsonOk, parseJsonBody } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
 import { CreateTargetSchema } from "@/lib/schemas";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 import type { Domain, TargetStatus } from "@/types";
 
 export async function GET(request: Request) {
@@ -33,6 +34,12 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const rl = checkRateLimit(`create-target:${auth.session.user.id}`, {
+    maxRequests: 20,
+    windowMs: 60_000,
+  });
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt);
 
   const parsed = await parseJsonBody(request, CreateTargetSchema);
   if ("error" in parsed) return parsed.error;

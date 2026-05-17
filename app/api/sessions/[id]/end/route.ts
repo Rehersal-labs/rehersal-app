@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/api/auth";
-import { jsonError, jsonOk } from "@/lib/api/http";
+import { jsonError, jsonOk, validateUUID } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
 import { evaluateSession } from "@/lib/evaluator";
 import { syncSessionTurns } from "@/lib/sessionTurns";
@@ -7,6 +7,9 @@ import { syncSessionTurns } from "@/lib/sessionTurns";
 type RouteContext = { params: { id: string } };
 
 export async function POST(_request: Request, { params }: RouteContext) {
+  const uuidErr = validateUUID(params.id, "session id");
+  if (uuidErr) return uuidErr;
+
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
@@ -41,12 +44,20 @@ export async function POST(_request: Request, { params }: RouteContext) {
     })
     .eq("id", params.id);
 
+  let transcriptWarning: string | undefined;
   try {
     if (session.bey_call_id) {
       await syncSessionTurns(params.id);
     }
-  } catch {
-    /* continue — evaluation may still run with partial transcript */
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "unknown";
+    console.error(`[sessions/${params.id}/end] Transcript sync failed: ${msg}`);
+    transcriptWarning = "Transcript could not be synced — evaluation will run on available data.";
+    // Mark session for manual review
+    await supabase
+      .from("sessions")
+      .update({ status: "ended" })
+      .eq("id", params.id);
   }
 
   await supabase
@@ -57,7 +68,11 @@ export async function POST(_request: Request, { params }: RouteContext) {
   void evaluateSession(params.id);
 
   return jsonOk(
-    { session_id: params.id, status: "evaluating" as const },
+    {
+      session_id: params.id,
+      status: "evaluating" as const,
+      ...(transcriptWarning ? { warning: transcriptWarning } : {}),
+    },
     202
   );
 }

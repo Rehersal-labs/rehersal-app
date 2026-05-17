@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { ZodError, type ZodSchema } from "zod";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Validate that a route param is a well-formed UUID. Returns error response or null. */
+export function validateUUID(value: string, label = "id"): NextResponse | null {
+  if (!UUID_RE.test(value)) {
+    return jsonError(`Invalid ${label}`, 400, "INVALID_ID");
+  }
+  return null;
+}
+
 export function jsonOk<T>(body: T, status = 200): NextResponse {
   return NextResponse.json(body, { status });
 }

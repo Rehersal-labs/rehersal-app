@@ -3,6 +3,7 @@ import { jsonError, jsonOk, parseJsonBody } from "@/lib/api/http";
 import { sendTeamInviteEmail } from "@/lib/email";
 import { createServiceSupabaseClient } from "@/lib/db";
 import { TeamInviteSchema } from "@/lib/schemas";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 /** Queue a team invite (audit log). Email delivery requires Resend — not yet wired. */
 export async function POST(request: Request) {
@@ -11,6 +12,12 @@ export async function POST(request: Request) {
 
   const forbidden = requireCoach(auth.session);
   if (forbidden) return forbidden;
+
+  const rl = checkRateLimit(`invite:${auth.session.organization.id}`, {
+    maxRequests: 20,
+    windowMs: 3_600_000, // 20 invites per hour per org
+  });
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt);
 
   if (auth.session.organization.mode !== "team") {
     return jsonError("Invites require team mode", 400);

@@ -5,6 +5,7 @@ import { createServiceSupabaseClient } from "@/lib/db";
 import { embedDocument } from "@/lib/embeddings";
 import { parseFile } from "@/lib/fileParser";
 import { DocTypeSchema } from "@/lib/schemas";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 import type { DocType, FileType } from "@/types";
 
 export const runtime = "nodejs";
@@ -39,6 +40,12 @@ function safeFilename(name: string): string {
 export async function POST(request: Request) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const rl = checkRateLimit(`upload:${auth.session.user.id}`, {
+    maxRequests: 10,
+    windowMs: 60_000,
+  });
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt);
 
   let formData: FormData;
   try {
