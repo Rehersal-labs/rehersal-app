@@ -18,31 +18,48 @@ export function LibraryCard({
   cloning?: boolean;
 }) {
   return (
-    <Card className="glass-card group flex flex-col border border-border p-4 transition-colors hover:border-border-default hover-lift">
-      <Badge variant="outline" className="w-fit font-mono text-caption uppercase">
-        {DOMAIN_LABELS[profile.domain]}
-      </Badge>
-      <h2 className="mt-2 font-display text-h2 text-foreground-primary">
-        {profile.name}
-      </h2>
-      <p className="text-small text-foreground-secondary">
-        {[profile.title, profile.company].filter(Boolean).join(" · ") || "—"}
-      </p>
-      <div className="mt-3 flex flex-wrap gap-2 font-mono text-caption text-foreground-tertiary">
-        <span>{profile.usage_count} uses</span>
+    <Card className="card-hover flex flex-col border border-border-subtle bg-surface p-5 shadow-card">
+      <div className="flex items-start justify-between gap-2">
+        <Badge
+          variant="outline"
+          className="border-accent/30 bg-accent/10 font-mono text-caption uppercase text-accent"
+        >
+          {DOMAIN_LABELS[profile.domain]}
+        </Badge>
         {profile.accuracy_rating != null && (
-          <>
-            <span>·</span>
-            <span>{profile.accuracy_rating.toFixed(1)}★</span>
-          </>
+          <span className="font-mono text-caption text-amber-400">
+            ★ {profile.accuracy_rating.toFixed(1)}
+          </span>
         )}
       </div>
-      <div className="mt-4 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-        <Button variant="ghost" size="sm" onClick={onPreview}>
+
+      <h2 className="mt-3 font-display text-h3 text-foreground-primary leading-snug">
+        {profile.name}
+      </h2>
+      <p className="mt-0.5 text-small text-foreground-secondary line-clamp-1">
+        {[profile.title, profile.company].filter(Boolean).join(" · ") || "—"}
+      </p>
+
+      <p className="mt-3 font-mono text-caption text-foreground-tertiary">
+        {profile.usage_count} clones
+      </p>
+
+      <div className="mt-4 flex gap-2 border-t border-border-subtle pt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1 border-border text-foreground-secondary hover:border-accent/40 hover:text-foreground-primary"
+          onClick={onPreview}
+        >
           Preview
         </Button>
-        <Button size="sm" disabled={cloning} onClick={onClone}>
-          {cloning ? "Cloning…" : "Clone"}
+        <Button
+          size="sm"
+          className="flex-1 bg-accent text-white hover:bg-accent/90"
+          disabled={cloning}
+          onClick={onClone}
+        >
+          {cloning ? "Cloning…" : "Clone →"}
         </Button>
       </div>
     </Card>

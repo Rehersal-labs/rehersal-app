@@ -4,34 +4,34 @@
 
 @layer base {
   :root {
-    --background: #faf9f7;
+    --background: #f6f7ff;
     --surface: #ffffff;
-    --surface-elevated: #f5f4f1;
-    --border-subtle: #e8e6e1;
-    --border-default: #d4d2cc;
-    --text-primary: #1a1a18;
-    --text-secondary: #5c5a54;
-    --text-tertiary: #8a8880;
-    --accent: #c8872a;
-    --success: #5a7a42;
-    --critical: #b84335;
-    --highlight-glow: rgba(200, 135, 42, 0.08);
-    --radius: 0.5rem;
+    --surface-elevated: #eef0ff;
+    --border-subtle: #dde0f5;
+    --border-default: #c3c8e8;
+    --text-primary: #0c0e2b;
+    --text-secondary: #474d7a;
+    --text-tertiary: #8288b0;
+    --accent: #4f46e5;
+    --success: #16a34a;
+    --critical: #dc2626;
+    --highlight-glow: rgba(79, 70, 229, 0.1);
+    --radius: 0.625rem;
   }
 
   .dark {
-    --background: #0a0a0b;
-    --surface: #141416;
-    --surface-elevated: #1c1c1f;
-    --border-subtle: #26262a;
-    --border-default: #33333a;
-    --text-primary: #f5f4f1;
-    --text-secondary: #a8a6a0;
-    --text-tertiary: #6e6c66;
-    --accent: #e8a33d;
-    --success: #7b9b5e;
-    --critical: #c84f3d;
-    --highlight-glow: rgba(232, 163, 61, 0.08);
+    --background: #08091a;
+    --surface: #0e1124;
+    --surface-elevated: #141830;
+    --border-subtle: #1c2040;
+    --border-default: #252b50;
+    --text-primary: #e8eaf8;
+    --text-secondary: #8891b8;
+    --text-tertiary: #505878;
+    --accent: #7c6af7;
+    --success: #34d399;
+    --critical: #f87171;
+    --highlight-glow: rgba(124, 106, 247, 0.15);
   }
 
   * {
@@ -48,38 +48,73 @@
     text-wrap: balance;
   }
 
-  .amber-glow {
-    box-shadow: 0 0 0 1px var(--accent), 0 0 24px var(--highlight-glow);
+  /* Indigo glow ring */
+  .indigo-glow {
+    box-shadow: 0 0 0 1px var(--accent), 0 0 32px var(--highlight-glow);
   }
 
-  /* Glass effects */
+  /* Glass panels */
   .glass-panel {
-    @apply backdrop-blur-md bg-white/5 border border-white/10;
+    background: rgba(14, 17, 36, 0.7);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(124, 106, 247, 0.12);
   }
   .glass-card {
-    @apply backdrop-blur-sm bg-white/[0.03] border border-white/[0.08];
+    background: rgba(20, 24, 48, 0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  /* Gradient text using amber accent */
+  /* Gradient text */
   .text-gradient {
-    @apply bg-gradient-to-r from-amber-400 to-orange-300 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-violet-400 via-indigo-400 to-blue-400 bg-clip-text text-transparent;
   }
 
-  /* Subtle mesh dot pattern */
+  /* Accent gradient for headings */
+  .text-gradient-accent {
+    @apply bg-gradient-to-br from-violet-300 to-indigo-400 bg-clip-text text-transparent;
+  }
+
+  /* Subtle dot grid */
   .mesh-bg {
-    background-image: radial-gradient(circle at 1px 1px, rgba(200, 135, 42, 0.06) 1px, transparent 0);
-    background-size: 32px 32px;
+    background-image: radial-gradient(circle at 1px 1px, rgba(124, 106, 247, 0.08) 1px, transparent 0);
+    background-size: 28px 28px;
   }
 
-  /* Lift on hover */
+  /* Card with gradient border on hover */
+  .card-hover {
+    @apply transition-all duration-200;
+    position: relative;
+  }
+  .card-hover:hover {
+    border-color: rgba(124, 106, 247, 0.4);
+    box-shadow: 0 0 0 1px rgba(124, 106, 247, 0.15), 0 8px 32px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+
   .hover-lift {
-    @apply transition-transform duration-200 hover:-translate-y-0.5;
+    @apply transition-all duration-200 hover:-translate-y-0.5;
   }
 
-  /* Stagger animation delays for list items */
-  .stagger-1 { animation-delay: 0.1s; }
-  .stagger-2 { animation-delay: 0.2s; }
-  .stagger-3 { animation-delay: 0.3s; }
+  /* Accent button glow */
+  .btn-glow {
+    box-shadow: 0 0 20px rgba(124, 106, 247, 0.35);
+  }
+  .btn-glow:hover {
+    box-shadow: 0 0 28px rgba(124, 106, 247, 0.5);
+  }
+
+  /* Score badge colours */
+  .score-high  { @apply text-emerald-400 bg-emerald-400/10; }
+  .score-mid   { @apply text-amber-400 bg-amber-400/10; }
+  .score-low   { @apply text-rose-400 bg-rose-400/10; }
+
+  /* Stagger delays */
+  .stagger-1 { animation-delay: 0.08s; }
+  .stagger-2 { animation-delay: 0.16s; }
+  .stagger-3 { animation-delay: 0.24s; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -108,105 +108,113 @@ export function SignInForm() {
   }
 
   return (
-    <Card className="border border-border bg-surface p-8 shadow-float animate-fade-in-up">
+    <div className="animate-fade-in-up">
+      {/* Logo + brand */}
       <div className="mb-8 text-center">
-        <p className="font-display text-h2 text-foreground-primary">Rehearsal</p>
-        <p className="mt-1 font-mono text-caption uppercase tracking-wider text-foreground-tertiary">
-          Stage-ready practice
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20 ring-2 ring-accent/30">
+          <span className="font-display text-h1 font-bold text-accent">R</span>
+        </div>
+        <h1 className="font-display text-h1 text-foreground-primary">Welcome back</h1>
+        <p className="mt-2 text-body text-foreground-secondary">
+          Practice the conversation before it matters.
         </p>
       </div>
 
-      <h1 className="text-center font-display text-h1 text-foreground-primary">
-        Sign in to Rehearsal
-      </h1>
-      <p className="mt-2 text-center text-body text-foreground-secondary">
-        Have the conversation before you have it.
-      </p>
+      <Card className="border border-border-subtle bg-surface p-8 shadow-float">
+        <div className="space-y-3">
+          {/* Google */}
+          <Button
+            type="button"
+            size="lg"
+            className="w-full bg-accent text-white hover:bg-accent/90 btn-glow"
+            disabled={loading !== null}
+            onClick={signInWithGoogle}
+          >
+            {loading === "google" ? (
+              "Redirecting…"
+            ) : (
+              <>
+                <GoogleIcon className="h-5 w-5" />
+                Continue with Google
+              </>
+            )}
+          </Button>
 
-      <div className="mt-8 space-y-3">
-        <Button
-          type="button"
-          className="w-full"
-          size="lg"
-          disabled={loading !== null}
-          onClick={signInWithGoogle}
-        >
-          {loading === "google" ? (
-            "Redirecting…"
-          ) : (
-            <>
-              <GoogleIcon className="h-5 w-5" />
-              Continue with Google
-            </>
+          <div className="relative py-1">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border-subtle" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-surface px-3 font-mono text-caption uppercase text-foreground-tertiary">
+                or
+              </span>
+            </div>
+          </div>
+
+          {/* Email magic link */}
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="w-full border-border text-foreground-secondary hover:border-accent/40 hover:text-foreground-primary"
+            disabled={loading !== null}
+            onClick={() => setEmailExpanded((v) => !v)}
+          >
+            <Mail className="h-4 w-4" strokeWidth={1.5} />
+            Continue with email
+            <ChevronDown
+              className={cn(
+                "ml-auto h-4 w-4 transition-transform duration-standard",
+                emailExpanded && "rotate-180"
+              )}
+              strokeWidth={1.5}
+            />
+          </Button>
+
+          {emailExpanded && (
+            <form onSubmit={sendMagicLink} className="space-y-3 pt-1 animate-fade-in-up">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-small text-foreground-secondary">
+                  Email address
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading !== null}
+                  className="border-border bg-surface-elevated"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading !== null || !email.trim()}
+              >
+                {loading === "email" ? "Sending…" : "Send magic link"}
+              </Button>
+            </form>
           )}
-        </Button>
-
-        <div className="relative py-2">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border-subtle" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-surface px-3 font-mono text-caption uppercase text-foreground-tertiary">
-              or
-            </span>
-          </div>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          size="lg"
-          disabled={loading !== null}
-          onClick={() => setEmailExpanded((v) => !v)}
-        >
-          <Mail className="h-4 w-4" strokeWidth={1.5} />
-          Continue with email
-          <ChevronDown
-            className={cn(
-              "ml-auto h-4 w-4 transition-transform duration-standard",
-              emailExpanded && "rotate-180"
-            )}
-            strokeWidth={1.5}
-          />
-        </Button>
-
-        {emailExpanded && (
-          <form onSubmit={sendMagicLink} className="space-y-4 pt-2 animate-fade-in-up">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading !== null}
-              />
-            </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading !== null || !email.trim()}
-            >
-              {loading === "email" ? "Sending…" : "Send magic link"}
-            </Button>
-          </form>
+        {message && (
+          <p className="mt-5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-small text-emerald-400" role="status">
+            {message}
+          </p>
         )}
-      </div>
+        {error && (
+          <p className="mt-5 rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-center text-small text-rose-400" role="alert">
+            {error}
+          </p>
+        )}
+      </Card>
 
-      {message && (
-        <p className="mt-4 text-center text-small text-success" role="status">
-          {message}
-        </p>
-      )}
-      {error && (
-        <p className="mt-4 text-center text-small text-critical" role="alert">
-          {error}
-        </p>
-      )}
-    </Card>
+      <p className="mt-6 text-center text-caption text-foreground-tertiary">
+        By continuing you agree to our Terms of Service and Privacy Policy.
+      </p>
+    </div>
   );
 }

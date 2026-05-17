@@ -58,9 +58,12 @@ const config: Config = {
         sidebar: "240px",
       },
       boxShadow: {
-        float: "0 12px 32px rgba(0,0,0,0.4)",
-        "light-sm": "0 1px 2px rgba(20,20,15,0.04)",
-        "light-lg": "0 8px 24px rgba(20,20,15,0.06)",
+        float: "0 12px 40px rgba(0,0,0,0.5)",
+        "light-sm": "0 1px 2px rgba(10,12,30,0.06)",
+        "light-lg": "0 8px 24px rgba(10,12,30,0.12)",
+        "accent-glow": "0 0 28px rgba(124,106,247,0.35)",
+        "card": "0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04)",
+        "card-hover": "0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,106,247,0.2)",
       },
       transitionDuration: {
         standard: "180ms",
@@ -74,9 +77,9 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(4px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        pulseAmber: {
+        pulseAccent: {
           "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.6" },
+          "50%": { opacity: "0.5" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
@@ -93,7 +96,7 @@ const config: Config = {
       },
       animation: {
         "fade-in-up": "fade-in-up 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        "pulse-amber": "pulseAmber 1.5s ease-in-out infinite",
+        "pulse-accent": "pulseAccent 1.5s ease-in-out infinite",
         float: "float 7s ease-in-out infinite",
         "float-slow": "float 10s ease-in-out infinite",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",

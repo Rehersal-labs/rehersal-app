@@ -1,11 +1,11 @@
 import { requireAuth } from "@/lib/api/auth";
 import { jsonError, jsonOk } from "@/lib/api/http";
-import { buildAvatarSystemPrompt } from "@/lib/avatarBriefBuilder";
 import { createCall } from "@/lib/beyondPresence";
 import { retrieveContext } from "@/lib/contextRetriever";
 import { createServiceSupabaseClient } from "@/lib/db";
+import { buildAvatarSystemPrompt } from "@/lib/prompts";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
-import type { Scenario, TargetProfile } from "@/types";
+import type { ConversationType, PersonalityJSON, Scenario, TargetProfile } from "@/types";
 
 type RouteContext = { params: { id: string } };
 
@@ -76,10 +76,22 @@ export async function POST(_request: Request, { params }: RouteContext) {
     includeCompany: auth.session.organization.mode === "team",
   });
 
+  const typedTarget = target as TargetProfile;
+  const typedScenario = scenario as Scenario;
+  const personaBlock =
+    typedTarget.avatar_brief_template ??
+    "You are simulating the target person in a high-stakes conversation.";
+  const personality = typedTarget.personality_json as PersonalityJSON | null;
+  const personaWithProfile = personality
+    ? `${personaBlock}\n\nPERSONALITY PROFILE:\n${JSON.stringify(personality, null, 2)}`
+    : personaBlock;
   const systemPrompt = buildAvatarSystemPrompt({
-    target: target as TargetProfile,
-    scenario: scenario as Scenario,
+    personaBlock: personaWithProfile,
     userContextBlock: userContext,
+    conversationType: typedScenario.conversation_type as ConversationType,
+    difficulty: typedScenario.difficulty ?? 3,
+    goal: typedScenario.goal,
+    durationMinutes: typedScenario.duration_minutes,
   });
 
   try {
