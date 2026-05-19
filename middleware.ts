@@ -1,7 +1,8 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PAGES = ["/", "/signin", "/callback", "/api/auth/callback"];
+// Routes the middleware never touches — no auth check, no redirect possible
+const PUBLIC_PATHS = ["/", "/signin", "/callback", "/api/auth/callback"];
 
 function isAuthDisabled(): boolean {
   return process.env.DISABLE_AUTH === "true";
@@ -12,7 +13,25 @@ function getSupabaseUrl(): string {
   return raw.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
 }
 
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`)
+  );
+}
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Never touch public auth paths — prevents any possible redirect loop
+  if (isPublicPath(pathname)) {
+    return NextResponse.next({ request: { headers: request.headers } });
+  }
+
+  // Dev auth bypass — skip Supabase entirely
+  if (isAuthDisabled()) {
+    return NextResponse.next({ request: { headers: request.headers } });
+  }
+
   let response = NextResponse.next({
     request: { headers: request.headers },
   });
@@ -47,33 +66,15 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-
-  if (isAuthDisabled()) {
-    if (pathname === "/signin" || pathname === "/") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-    return response;
-  }
-
-  if (pathname.startsWith("/api/")) {
-    return response;
-  }
-
-  const isPublicPage = PUBLIC_PAGES.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`)
-  );
-
-  if (user && pathname === "/signin") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-  if (!user && !isPublicPage) {
-    const signIn = new URL("/signin", request.url);
+  if (!user) {
+    // Use nextUrl.clone() so Railway's proxy host is preserved correctly
+    const signInUrl = request.nextUrl.clone();
+    signInUrl.pathname = "/signin";
+    signInUrl.search = "";
     if (pathname !== "/") {
-      signIn.searchParams.set("next", pathname);
+      signInUrl.searchParams.set("next", pathname);
     }
-    return NextResponse.redirect(signIn);
+    return NextResponse.redirect(signInUrl);
   }
 
   return response;
@@ -81,6 +82,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Skip: static files, images, fonts, favicon, AND auth pages
+    "/((?!_next/static|_next/image|favicon.ico|signin|callback|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)",
   ],
 };

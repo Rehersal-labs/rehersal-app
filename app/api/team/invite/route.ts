@@ -41,8 +41,7 @@ export async function POST(request: Request) {
   if (error) return jsonError(error.message, 500);
 
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    "http://localhost:3000";
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
 
   const emailResult = await sendTeamInviteEmail({
     to: parsed.data.email,
