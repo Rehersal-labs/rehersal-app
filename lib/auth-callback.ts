@@ -15,9 +15,14 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
     requestUrl.searchParams.get("error");
   const nextParam = requestUrl.searchParams.get("next");
 
+  const appUrl = (
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+    requestUrl.origin
+  );
+
   const fail = (reason: string) =>
     NextResponse.redirect(
-      `${requestUrl.origin}/signin?error=auth&reason=${encodeURIComponent(reason)}`
+      `${appUrl}/signin?error=auth&reason=${encodeURIComponent(reason)}`
     );
 
   if (oauthError) return fail(oauthError);
@@ -75,5 +80,5 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
         ? "/onboarding"
         : "/dashboard";
 
-  return NextResponse.redirect(`${requestUrl.origin}${next}`);
+  return NextResponse.redirect(`${appUrl}${next}`);
 }
