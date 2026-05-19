@@ -6,6 +6,33 @@ import { isLibraryDbSeedable } from "@/lib/libraryDbReady";
 
 type RouteContext = { params: { id: string } };
 
+const MISSING_COLUMN_RE = /'([^']+)' column|column [^.]+\."?([^"\s]+)"? does not exist/i;
+
+async function insertTargetProfile(
+  supabase: ReturnType<typeof createServiceSupabaseClient>,
+  row: Record<string, unknown>
+) {
+  const candidate = { ...row };
+
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const result = await supabase
+      .from("target_profiles")
+      .insert(candidate)
+      .select()
+      .single();
+
+    if (!result.error) return result;
+
+    const missing = result.error.message.match(MISSING_COLUMN_RE)?.[1]
+      ?? result.error.message.match(MISSING_COLUMN_RE)?.[2];
+    if (!missing || !(missing in candidate)) return result;
+
+    delete candidate[missing];
+  }
+
+  return supabase.from("target_profiles").insert(candidate).select().single();
+}
+
 export async function POST(_request: Request, { params }: RouteContext) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
@@ -15,9 +42,9 @@ export async function POST(_request: Request, { params }: RouteContext) {
 
   const supabase = createServiceSupabaseClient();
 
-  const { data: target, error: insertError } = await supabase
-    .from("target_profiles")
-    .insert({
+  const { data: target, error: insertError } = await insertTargetProfile(
+    supabase,
+    {
       org_id: auth.session.organization.id,
       created_by: auth.session.user.id,
       name: profile.name,
@@ -30,9 +57,8 @@ export async function POST(_request: Request, { params }: RouteContext) {
       is_library: true,
       is_public_figure: profile.category === "real_figure",
       status: "complete",
-    })
-    .select()
-    .single();
+    }
+  );
 
   if (insertError || !target) {
     return jsonError(insertError?.message ?? "Failed to clone profile", 500);

@@ -14,11 +14,20 @@ export async function GET(_request: Request, { params }: RouteContext) {
   if (!target) return jsonError("Target not found", 404);
 
   const supabase = createServiceSupabaseClient();
-  const { data: sources, error } = await supabase
+  let { data: sources, error } = await supabase
     .from("target_sources")
     .select("*")
     .eq("target_profile_id", params.id)
     .order("created_at", { ascending: true });
+
+  if (error?.message.includes("created_at")) {
+    const fallback = await supabase
+      .from("target_sources")
+      .select("*")
+      .eq("target_profile_id", params.id);
+    sources = fallback.data;
+    error = fallback.error;
+  }
 
   if (error) return jsonError(error.message, 500);
 

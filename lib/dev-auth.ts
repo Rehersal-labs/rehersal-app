@@ -21,22 +21,31 @@ async function loadSessionForUserId(userId: string): Promise<AuthSession | null>
     .eq("id", userId)
     .single();
 
-  if (!user?.default_org_id) return null;
+  if (!user) return null;
+
+  let orgId = user.default_org_id as string | null | undefined;
+  let membershipQuery = supabase
+    .from("memberships")
+    .select("*")
+    .eq("user_id", userId);
+
+  if (orgId) membershipQuery = membershipQuery.eq("org_id", orgId);
+
+  const { data: membership } = await membershipQuery
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  orgId = orgId ?? membership?.org_id;
+  if (!orgId || !membership) return null;
 
   const { data: organization } = await supabase
     .from("organizations")
     .select("*")
-    .eq("id", user.default_org_id)
+    .eq("id", orgId)
     .single();
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("org_id", user.default_org_id)
-    .single();
-
-  if (!organization || !membership) return null;
+  if (!organization) return null;
 
   return { user, membership, organization };
 }
