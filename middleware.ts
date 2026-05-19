@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PAGES = ["/signin", "/callback", "/api/auth/callback"];
+const PUBLIC_PAGES = ["/", "/signin", "/callback", "/api/auth/callback"];
 
 function isAuthDisabled(): boolean {
   return process.env.DISABLE_AUTH === "true";
