@@ -28,8 +28,18 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
   if (oauthError) return fail(oauthError);
   if (!code) return fail("no_code");
 
+  // Guard: env vars missing → show clear error instead of 500
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return fail("missing_supabase_env_vars");
+  }
+
   const cookieStore = cookies();
-  const supabase = createServerClient(getSupabaseUrl(), getSupabaseAnonKey(), {
+  const supabase = createServerClient(
+    supabaseUrl.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, ""),
+    supabaseAnonKey,
+    {
     cookies: {
       getAll() {
         return cookieStore.getAll();
