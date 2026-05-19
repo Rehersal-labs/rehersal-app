@@ -69,8 +69,12 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
       });
     }
   } catch (e) {
-    console.error("[auth/callback] provision:", e);
-    return fail(e instanceof Error ? e.message : "provision_failed");
+    const msg =
+      e instanceof Error
+        ? e.message
+        : (e as { message?: string })?.message ?? "provision_failed";
+    console.error("[auth/callback] provision error:", msg, e);
+    return fail(msg);
   }
 
   const next =
