@@ -1,5 +1,4 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { provisionNewUser } from "@/lib/auth";
 
@@ -16,34 +15,32 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
   };
 
   try {
-    const requestUrl = new URL(request.url);
-    const code = requestUrl.searchParams.get("code");
+    const code = request.nextUrl.searchParams.get("code");
     const oauthError =
-      requestUrl.searchParams.get("error_description") ??
-      requestUrl.searchParams.get("error");
-    const nextParam = requestUrl.searchParams.get("next");
+      request.nextUrl.searchParams.get("error_description") ??
+      request.nextUrl.searchParams.get("error");
+    const nextParam = request.nextUrl.searchParams.get("next");
 
     if (oauthError) return fail(oauthError);
     if (!code) return fail("no_code");
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
     if (!supabaseUrl) return fail("missing_NEXT_PUBLIC_SUPABASE_URL");
     if (!supabaseAnonKey) return fail("missing_NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
     const cleanUrl = supabaseUrl.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
 
-    const cookieStore = cookies();
+    // Collect cookies Supabase wants to set, apply them to the final response
+    const pendingCookies: Array<{ name: string; value: string; options: CookieOptions }> = [];
+
     const supabase = createServerClient(cleanUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
-          return cookieStore.getAll();
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
+          cookiesToSet.forEach((c) => pendingCookies.push(c));
         },
       },
     });
@@ -52,12 +49,12 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
 
     if (sessionError) {
       console.error("[callback] exchangeCodeForSession:", sessionError.message);
-      return fail(`session_${sessionError.message.replace(/\s+/g, "_").slice(0, 60)}`);
+      return fail(`session_error__${sessionError.message.replace(/\s+/g, "_").slice(0, 60)}`);
     }
 
     if (!data?.user) return fail("no_user");
 
-    // Check if user already exists
+    // Check if user already has a profile
     const { data: existingUser } = await supabase
       .from("users")
       .select("id")
@@ -67,9 +64,9 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
     let isNewUser = false;
     if (!existingUser) {
       isNewUser = true;
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-      if (!serviceKey) return fail("missing_SUPABASE_SERVICE_ROLE_KEY");
-
+      if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        return fail("missing_SUPABASE_SERVICE_ROLE_KEY");
+      }
       await provisionNewUser({
         userId: data.user.id,
         email: data.user.email ?? "",
@@ -78,14 +75,19 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
       });
     }
 
-    const next =
+    const dest =
       nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
         ? nextParam
         : isNewUser
           ? "/onboarding"
           : "/dashboard";
 
-    return NextResponse.redirect(`${appUrl}${next}`);
+    // Build redirect and stamp all session cookies onto it
+    const response = NextResponse.redirect(`${appUrl}${dest}`);
+    pendingCookies.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, options);
+    });
+    return response;
 
   } catch (e) {
     const msg =
@@ -95,6 +97,6 @@ export async function handleAuthCallback(request: NextRequest): Promise<NextResp
           ? String((e as { message: unknown }).message)
           : "unknown_error";
     console.error("[callback] unhandled:", msg, e);
-    return fail(`error_${msg.replace(/\s+/g, "_").slice(0, 80)}`);
+    return fail(`error__${msg.replace(/\s+/g, "_").slice(0, 80)}`);
   }
 }
