@@ -2,6 +2,8 @@ import { requireAuth, requireCoach } from "@/lib/api/auth";
 import { jsonError, jsonOk } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 /** List org members with user profile — coach/owner only (team mode). */
 export async function GET() {
   const auth = await requireAuth();

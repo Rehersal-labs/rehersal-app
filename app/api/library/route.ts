@@ -3,6 +3,8 @@ import { jsonError, jsonOk } from "@/lib/api/http";
 import { listLibraryProfiles } from "@/lib/libraryApi";
 import type { Domain, LibraryCategory } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;

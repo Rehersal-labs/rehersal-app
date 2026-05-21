@@ -3,6 +3,8 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { requireSession } from "@/lib/auth";
 import { createServiceSupabaseClient } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export default async function AppLayout({
   children,
 }: {

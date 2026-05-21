@@ -2,6 +2,8 @@ import { requireAuth, requireCoach } from "@/lib/api/auth";
 import { jsonError, jsonOk } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;

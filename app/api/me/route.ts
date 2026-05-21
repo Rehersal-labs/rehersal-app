@@ -1,6 +1,8 @@
 import { requireAuth } from "@/lib/api/auth";
 import { jsonOk } from "@/lib/api/http";
 
+export const dynamic = "force-dynamic";
+
 /** Current user, org, and membership for app shell / client hooks. */
 export async function GET() {
   const auth = await requireAuth();

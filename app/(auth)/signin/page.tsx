@@ -4,6 +4,8 @@ import { getSession } from "@/lib/auth";
 import { SignInForm } from "@/components/auth/SignInForm";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 
+export const dynamic = "force-dynamic";
+
 export default async function SignInPage() {
   const session = await getSession();
   if (session) redirect("/dashboard");

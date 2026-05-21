@@ -2,6 +2,8 @@ import { requireAuth, requireOwner } from "@/lib/api/auth";
 import { jsonError } from "@/lib/api/http";
 import { createServiceSupabaseClient } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 /** Export workspace data as JSON — owner only. No OpenAI required. */
 export async function GET() {
   const auth = await requireAuth();
