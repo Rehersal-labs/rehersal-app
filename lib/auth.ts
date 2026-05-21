@@ -11,6 +11,11 @@ export async function getSession(): Promise<AuthSession | null> {
     return getDevSession();
   }
 
+  // Guard: if Supabase env vars are missing (e.g. during Railway build), return null
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return null;
+  }
+
   const supabase = createServerSupabaseClient();
   const {
     data: { user: authUser },
