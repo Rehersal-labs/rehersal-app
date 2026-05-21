@@ -1,17 +1,7 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Routes the middleware never touches — no auth check, no redirect possible
 const PUBLIC_PATHS = ["/", "/signin", "/callback", "/api/auth/callback"];
-
-function isAuthDisabled(): boolean {
-  return process.env.DISABLE_AUTH === "true";
-}
-
-function getSupabaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  return raw.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
-}
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
@@ -22,52 +12,50 @@ function isPublicPath(pathname: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Never touch public auth paths — prevents any possible redirect loop
+  // Never run auth checks on public paths — prevents redirect loops
   if (isPublicPath(pathname)) {
     return NextResponse.next({ request: { headers: request.headers } });
   }
 
-  // Dev auth bypass — skip Supabase entirely
-  if (isAuthDisabled()) {
+  // Dev auth bypass
+  if (process.env.DISABLE_AUTH === "true") {
     return NextResponse.next({ request: { headers: request.headers } });
   }
 
-  let response = NextResponse.next({
-    request: { headers: request.headers },
-  });
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+
+  // If env vars missing, pass through — page-level auth will handle it
+  if (!supabaseUrl || !supabaseKey) {
+    return NextResponse.next({ request: { headers: request.headers } });
+  }
+
+  let response = NextResponse.next({ request: { headers: request.headers } });
 
   const supabase = createServerClient(
-    getSupabaseUrl(),
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, ""),
+    supabaseKey,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
+        getAll() {
+          return request.cookies.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({ name, value, ...options });
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
-          response.cookies.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({ name, value: "", ...options });
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
-          response.cookies.set({ name, value: "", ...options });
+        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          response = NextResponse.next({ request: { headers: request.headers } });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2])
+          );
         },
       },
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    // Use nextUrl.clone() so Railway's proxy host is preserved correctly
     const signInUrl = request.nextUrl.clone();
     signInUrl.pathname = "/signin";
     signInUrl.search = "";
@@ -82,7 +70,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Skip: static files, images, fonts, favicon, AND auth pages
     "/((?!_next/static|_next/image|favicon.ico|signin|callback|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)",
   ],
 };

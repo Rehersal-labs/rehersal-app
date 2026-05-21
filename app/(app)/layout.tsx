@@ -12,14 +12,18 @@ export default async function AppLayout({
 
   let pendingAssignments = 0;
   if (session.organization.mode === "team") {
-    const supabase = createServiceSupabaseClient();
-    const { count } = await supabase
-      .from("assignments")
-      .select("*", { count: "exact", head: true })
-      .eq("org_id", session.organization.id)
-      .eq("learner_id", session.user.id)
-      .eq("status", "pending");
-    pendingAssignments = count ?? 0;
+    try {
+      const supabase = createServiceSupabaseClient();
+      const { count } = await supabase
+        .from("assignments")
+        .select("*", { count: "exact", head: true })
+        .eq("org_id", session.organization.id)
+        .eq("learner_id", session.user.id)
+        .eq("status", "pending");
+      pendingAssignments = count ?? 0;
+    } catch {
+      // Non-fatal — badge just won't show
+    }
   }
 
   return (
